@@ -19,9 +19,9 @@ enum GameEvent {
 
 enum Wall {
   None,
-  Right,
-  Down,
-  RightDown,
+  Left,
+  Up,
+  LeftUp,
 }
 
 class Board {
@@ -30,7 +30,7 @@ class Board {
 
   List<List<Tile>> tiles = List();
 
-  final List<Wall> walls =
+  List<Wall> walls =
       List(width * height + width + height); // TODO Better representation
 
   Board() {
@@ -61,20 +61,41 @@ class Board {
     }
   }
 
+  factory Board.fromJson(Map<String, dynamic> parsedJson) {
+    Board b = Board();
+
+    b.tiles = parsedJson['tiles']
+        .map((List<dynamic> column) =>
+            column.map((dynamic tile) => Tile.fromJson(tile)).toList())
+        .toList();
+    b.walls =
+        parsedJson['walls'].map((dynamic wall) => Wall.values[wall]).toList();
+
+    return b;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'tiles': tiles
+          .map((List<Tile> column) => column.map((Tile tile) => tile.toJson()).toList()).toList(),
+      'walls': walls.map((Wall wall) => wall.index).toList(),
+    };
+  }
+
   bool hasLeftWall(int x, int y) {
-    return walls[y * width + x - 1].index & Wall.Right.index > 0;
+    return walls[y * width + x].index & Wall.Left.index > 0;
   }
 
   bool hasRightWall(int x, int y) {
-    return walls[y * width + x].index & Wall.Right.index > 0;
+    return walls[y * width + x + 1].index & Wall.Left.index > 0;
   }
 
   bool hasDownWall(int x, int y) {
-    return walls[y * width + x].index & Wall.Down.index > 0;
+    return walls[(y + 1) * width + x].index & Wall.Up.index > 0;
   }
 
   bool hasUpWall(int x, int y) {
-    return walls[(y - 1) * width + x].index & Wall.Down.index > 0;
+    return walls[y * width + x].index & Wall.Up.index > 0;
   }
 
   bool hasWall(Direction dir, int x, int y) {
@@ -82,16 +103,17 @@ class Board {
       case Direction.Right:
         return hasRightWall(x, y);
         break;
+
       case Direction.Up:
-        return hasRightWall(x, y);
+        return hasUpWall(x, y);
         break;
 
       case Direction.Left:
-        return hasRightWall(x, y);
+        return hasLeftWall(x, y);
         break;
 
       case Direction.Down:
-        return hasRightWall(x, y);
+        return hasDownWall(x, y);
         break;
 
       default:

@@ -35,14 +35,14 @@ class Game {
 
         if (!rocket.departed) {
           if (e is Cat) {
-            score[rocket.owner.index] -= score[rocket.owner.index] ~/ 3;
+            score[rocket.player.index] -= score[rocket.player.index] ~/ 3;
           } else if (e is GoldenMouse) {
-            score[rocket.owner.index] += 50;
+            score[rocket.player.index] += 50;
           } else if (e is SpecialMouse) {
             // TODO Handle game events
-            score[rocket.owner.index]++;
+            score[rocket.player.index]++;
           } else if (e is Mouse) {
-            score[rocket.owner.index]++;
+            score[rocket.player.index]++;
           }
         } else // Equivalent to a Pit
         {
@@ -67,12 +67,12 @@ class Game {
   }
 
   void moveEntities() {
-    entities.forEach((int, Entity e) {
-      e.movement = moveTick(e.movement);
+    entities.forEach((int i, Entity e) {
+      entities[i].movement = moveTick(e.movement, (e is Cat ? 2 : 3));
     });
   }
 
-  EntityMovement moveTick(EntityMovement e) {
+  EntityMovement moveTick(EntityMovement e, int moveSpeed) {
     int x = e.x;
     int y = e.y;
     Direction front = e.direction;
@@ -104,7 +104,7 @@ class Game {
     if (!trapped) {
       // If the entity is trapped it shall not move
 
-      step = step + e.moveSpeed();
+      step = step + moveSpeed; // FIXME
 
       if (step == EntityMovement.maxStep) {
         switch (front) {
@@ -139,6 +139,8 @@ class Game {
           default:
             break;
         }
+
+        step = 0;
       }
     }
 

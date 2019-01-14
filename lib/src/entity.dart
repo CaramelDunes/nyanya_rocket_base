@@ -8,7 +8,7 @@ enum EntityType {
 }
 
 class EntityMovement {
-  static const int maxStep = 30;
+  static const int maxStep = 60;
   final int x;
   final int y;
   final int step; // Between 0 and maxStep
