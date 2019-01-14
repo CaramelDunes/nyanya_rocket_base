@@ -4,23 +4,28 @@ import 'dart:convert';
 import 'package:nyanya_rocket_base/nyanya_rocket_base.dart';
 
 void main() {
-  test('create an empty board', () {
-    final board = Board();
-
-    for (int x = 0; x < Board.width; x++) {
-      for (int y = 0; y < Board.height; y++) {
-        expect(board.tiles[x][y].runtimeType, Empty);
-        expect(board.hasRightWall(x, y), false);
-        expect(board.hasUpWall(x, y), false);
-        expect(board.hasLeftWall(x, y), false);
-        expect(board.hasDownWall(x, y), false);
-      }
-    }
+  test('Arrow.toJson()', () {
+    final Arrow arrow =
+        Arrow(player: PlayerColor.Blue, direction: Direction.Right);
+    expect(jsonEncode(arrow.toJson()), '{"type":1,"player":0,"direction":0}');
   });
 
-  test('Board.toJson() on an empty board', () {
-    final board = Board();
-    String json = jsonEncode(board.toJson());
-    expect(json, json);
+  test('Rocket.toJson()', () {
+    final Rocket rocket = Rocket(player: PlayerColor.Blue);
+    expect(jsonEncode(rocket.toJson()), '{"type":3,"player":0}');
+  });
+
+  test('Tile.fromJson() on an Arrow', () {
+    final Tile tile =
+        Tile.fromJson(jsonDecode('{"type":1,"player":0,"direction":0}'));
+    expect(tile.runtimeType, Arrow);
+    expect((tile as Arrow).player, PlayerColor.Blue);
+    expect((tile as Arrow).direction, Direction.Right);
+  });
+
+  test('Tile.fromJson() on a Rocket', () {
+    final Tile tile = Tile.fromJson(jsonDecode('{"type":3,"player":0}'));
+    expect(tile.runtimeType, Rocket);
+    expect((tile as Rocket).player, PlayerColor.Blue);
   });
 }
