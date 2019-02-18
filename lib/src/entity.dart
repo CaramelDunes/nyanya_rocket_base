@@ -1,4 +1,5 @@
 import 'package:nyanya_rocket_base/src/board.dart';
+import 'package:nyanya_rocket_base/src/protocol/game_server.pb.dart';
 
 enum EntityType {
   Cat,
@@ -7,47 +8,146 @@ enum EntityType {
   SpecialMouse,
 }
 
-class EntityMovement {
-  static const int maxStep = 60;
-  final int x;
-  final int y;
-  final int step; // Between 0 and maxStep
-  final Direction direction;
-
-  EntityMovement(this.x, this.y, this.direction, this.step);
-
-  EntityMovement.copy(EntityMovement e)
-      : x = e.x,
-        y = e.y,
-        step = e.step,
-        direction = e.direction;
-  EntityMovement.centered(this.x, this.y, this.direction) : step = maxStep ~/ 2;
-  EntityMovement.entering(this.x, this.y, this.direction) : step = 0;
-
-  EntityMovement withDirection(Direction newDirection) =>
-      EntityMovement(x, y, newDirection, step);
-
-  int moveSpeed() => 3;
-}
-
 abstract class Entity {
-  EntityMovement movement;
+  BoardPosition position;
 
-  Entity(this.movement);
+  Entity({this.position});
+
+  factory Entity.fromJson(Map<String, dynamic> parsedJson) {
+    return Entity.fromEntityType(EntityType.values[parsedJson['type']],
+        BoardPosition.fromJson(parsedJson['position']));
+  }
+
+  factory Entity.fromEntityType(EntityType type, BoardPosition position) {
+    switch (type) {
+      case EntityType.Cat:
+        return Cat(position: position);
+        break;
+
+      case EntityType.Mouse:
+        return Mouse(position: position);
+        break;
+
+      case EntityType.GoldenMouse:
+        return GoldenMouse(position: position);
+        break;
+
+      case EntityType.SpecialMouse:
+        return SpecialMouse(position: position);
+        break;
+
+      default:
+        return Mouse(position: position);
+        break;
+    }
+  }
+
+  ProtocolEntity toPbEntity() {
+    ProtocolEntity e = ProtocolEntity()
+      ..direction = ProtocolDirection.values[position.direction.index]
+      ..x = position.x
+      ..y = position.y
+      ..step = position.step;
+
+    switch (runtimeType) {
+      case Cat:
+        e.type = ProtocolEntityType.CAT;
+        break;
+
+      case SpecialMouse:
+        e.type = ProtocolEntityType.SPECIAL_MOUSE;
+        break;
+
+      case GoldenMouse:
+        e.type = ProtocolEntityType.GOLDEN_MOUSE;
+        break;
+
+      case Mouse:
+        e.type = ProtocolEntityType.MOUSE;
+        break;
+    }
+
+    return e;
+  }
+
+  factory Entity.fromPbEntity(ProtocolEntity entity) {
+    Entity e;
+    switch (entity.type) {
+      case ProtocolEntityType.CAT:
+        e = Cat(
+            position: BoardPosition(entity.x, entity.y,
+                Direction.values[entity.direction.value], entity.step));
+        break;
+
+      case ProtocolEntityType.MOUSE:
+        e = Mouse(
+            position: BoardPosition(entity.x, entity.y,
+                Direction.values[entity.direction.value], entity.step));
+        break;
+
+      case ProtocolEntityType.GOLDEN_MOUSE:
+        e = GoldenMouse(
+            position: BoardPosition(entity.x, entity.y,
+                Direction.values[entity.direction.value], entity.step));
+        break;
+
+      case ProtocolEntityType.SPECIAL_MOUSE:
+        e = SpecialMouse(
+            position: BoardPosition(entity.x, entity.y,
+                Direction.values[entity.direction.value], entity.step));
+        break;
+    }
+
+    return e;
+  }
+
+  int moveSpeed();
+
+  Map<String, dynamic> toJson();
 }
 
 class Cat extends Entity {
-  Cat(EntityMovement movement) : super(movement);
+  Cat({BoardPosition position}) : super(position: position);
+
+  @override
+  int moveSpeed() => 2;
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': EntityType.Cat.index,
+        'position': position.toJson(),
+      };
 }
 
 class Mouse extends Entity {
-  Mouse(EntityMovement movement) : super(movement);
+  Mouse({BoardPosition position}) : super(position: position);
+
+  @override
+  int moveSpeed() => 3;
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': EntityType.Mouse.index,
+        'position': position.toJson(),
+      };
 }
 
 class GoldenMouse extends Mouse {
-  GoldenMouse(EntityMovement movement) : super(movement);
+  GoldenMouse({BoardPosition position}) : super(position: position);
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': EntityType.GoldenMouse.index,
+        'position': position.toJson(),
+      };
 }
 
 class SpecialMouse extends Mouse {
-  SpecialMouse(EntityMovement movement) : super(movement);
+  SpecialMouse({BoardPosition position}) : super(position: position);
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': EntityType.SpecialMouse.index,
+        'position': position.toJson(),
+      };
 }

@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:nyanya_rocket_base/src/board.dart';
+import 'package:nyanya_rocket_base/src/protocol/game_server.pb.dart';
 
 enum TileType {
   Empty,
@@ -9,15 +10,32 @@ enum TileType {
   Generator,
 }
 
-enum PlayerColor {
-  Blue,
-  Yellow,
-  Red,
-  Green,
+class PlayerColor {
+  final int index;
+
+  const PlayerColor._internal(this.index);
+
+  @override
+  String toString() => 'PlayerColor.$index';
+
+  ProtocolPlayerColor toProtocolPlayerColor() =>
+      ProtocolPlayerColor.values[index];
+
+  static const Blue = const PlayerColor._internal(0);
+  static const Yellow = const PlayerColor._internal(1);
+  static const Red = const PlayerColor._internal(2);
+  static const Green = const PlayerColor._internal(3);
+
+  static const List<PlayerColor> values = const <PlayerColor>[
+    Blue,
+    Yellow,
+    Red,
+    Green,
+  ];
 }
 
 abstract class Tile {
-  Tile();
+  const Tile();
 
   factory Tile.fromJson(Map<String, dynamic> parsedJson) {
     switch (TileType.values[parsedJson['type']]) {
@@ -45,7 +63,35 @@ abstract class Tile {
     return Empty();
   }
 
+  factory Tile.fromPbTile(ProtocolTile tile) {
+    Tile t;
+
+    switch (tile.type) {
+      case ProtocolTileType.EMPTY:
+        t = Empty();
+        break;
+
+      case ProtocolTileType.ROCKET:
+        t = Rocket(player: PlayerColor.values[tile.owner.value]);
+        break;
+
+      case ProtocolTileType.ARROW:
+        t = Arrow(
+            player: PlayerColor.values[tile.owner.value],
+            direction: Direction.values[tile.direction.value]);
+        break;
+
+      case ProtocolTileType.GENERATOR:
+        t = Generator(direction: Direction.values[tile.direction.value]);
+        break;
+    }
+
+    return t;
+  }
+
   Map<String, dynamic> toJson();
+
+  ProtocolTile toPbTile();
 }
 
 class Empty extends Tile {
@@ -55,22 +101,40 @@ class Empty extends Tile {
       'type': TileType.Empty.index,
     };
   }
+
+  @override
+  ProtocolTile toPbTile() => ProtocolTile()..type = ProtocolTileType.EMPTY;
 }
 
 class Arrow extends Tile {
+  static const int defaultExpiration = 1200;
+
   final PlayerColor player;
   final Direction direction;
   final bool full;
-  final int tickCount;
+  final int expiration; // Default is 10s
 
-  Arrow(
+  const Arrow(
       {@required this.player,
       @required this.direction,
       this.full = true,
-      this.tickCount = 0});
+      this.expiration = defaultExpiration});
+
+  const Arrow.notExpirable(
+      {@required this.player, @required this.direction, this.full = true})
+      : expiration = 600 * 1000000;
+
   Tile damaged() => full
       ? Arrow(player: this.player, direction: this.direction, full: false)
       : Empty();
+
+  Tile withExpiration(int expiration) => expiration <= 0
+      ? Empty()
+      : Arrow(
+          player: this.player,
+          direction: this.direction,
+          full: this.full,
+          expiration: expiration);
 
   @override
   Map<String, dynamic> toJson() => {
@@ -83,7 +147,13 @@ class Arrow extends Tile {
       : player = PlayerColor.values[parsedJson['player']],
         direction = Direction.values[parsedJson['direction']],
         full = true,
-        tickCount = 0;
+        expiration = 0;
+
+  @override
+  ProtocolTile toPbTile() => ProtocolTile()
+    ..type = ProtocolTileType.ARROW
+    ..owner = ProtocolPlayerColor.values[player.index]
+    ..direction = ProtocolDirection.values[direction.index];
 }
 
 class Pit extends Tile {
@@ -93,13 +163,17 @@ class Pit extends Tile {
       'type': TileType.Pit.index,
     };
   }
+
+  ProtocolTile toPbTile() => ProtocolTile()..type = ProtocolTileType.PIT;
 }
 
 class Rocket extends Tile {
   final PlayerColor player;
   final bool departed;
 
-  Rocket({@required this.player, this.departed = false});
+  const Rocket({@required this.player, this.departed = false});
+
+  const Rocket.departed({@required this.player}) : departed = true;
 
   @override
   Map<String, dynamic> toJson() => {
@@ -110,12 +184,17 @@ class Rocket extends Tile {
   Rocket.fromJson(Map<String, dynamic> parsedJson)
       : player = PlayerColor.values[parsedJson['player']],
         departed = false;
+
+  @override
+  ProtocolTile toPbTile() => ProtocolTile()
+    ..type = ProtocolTileType.ROCKET
+    ..owner = ProtocolPlayerColor.values[player.index];
 }
 
 class Generator extends Tile {
   final Direction direction;
 
-  Generator({@required this.direction});
+  const Generator({@required this.direction});
 
   @override
   Map<String, dynamic> toJson() => {
@@ -125,4 +204,9 @@ class Generator extends Tile {
 
   Generator.fromJson(Map<String, dynamic> parsedJson)
       : direction = Direction.values[parsedJson['direction']];
+
+  @override
+  ProtocolTile toPbTile() => ProtocolTile()
+    ..type = ProtocolTileType.GENERATOR
+    ..direction = ProtocolDirection.values[direction.index];
 }
