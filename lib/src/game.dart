@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:meta/meta.dart';
 import 'dart:collection';
 
 import 'package:nyanya_rocket_base/src/board.dart';
@@ -26,16 +25,19 @@ enum GameEvent {
 
 enum GeneratorPolicy {
   Regular,
+  Challenge,
   MouseMania,
   CatAttack,
+  MouseMonopoly
 }
 
 class Game {
   List<int> _scores = List.filled(4, 0, growable: false);
   Board board = Board();
   SplayTreeMap<int, Entity> entities = SplayTreeMap();
-  Random rng = Random();
   GameEvent currentEvent = GameEvent.None;
+  GeneratorPolicy generatorPolicy = GeneratorPolicy.Regular;
+  Random _rng = Random();
   int _livingCats = 0;
 
   MouseEatenCallback onMouseEaten;
@@ -51,8 +53,6 @@ class Game {
         (String id, dynamic entity) =>
             MapEntry<int, Entity>(int.parse(id), Entity.fromJson(entity))));
   }
-
-  Game.copy(Game from) {}
 
   Map<String, dynamic> toJson() => {
         'board': board.toJson(),
@@ -84,8 +84,13 @@ class Game {
 
   int scoreOf(PlayerColor player) => _scores[player.index];
 
-  void tickEntities() {
-    moveEntities();
+  void tick() {
+    _tickEntities();
+    _tickTiles();
+  }
+
+  void _tickEntities() {
+    _moveEntities();
 
     List<Cat> cats = List();
     entities.forEach((int i, Entity e) {
@@ -100,7 +105,7 @@ class Game {
       bool dead = false;
       if (e is Mouse) {
         for (Cat cat in cats) {
-          if (colliding(e, cat)) {
+          if (_colliding(e, cat)) {
             dead = true;
 
             if (onMouseEaten != null) {
@@ -119,15 +124,15 @@ class Game {
     entities = newEntities;
   }
 
-  void tickTiles() {
+  void _tickTiles() {
     for (int x = 0; x < Board.width; x++) {
       for (int y = 0; y < Board.height; y++) {
-        board.tiles[x][y] = updateTile(x, y, board.tiles[x][y]);
+        board.tiles[x][y] = _updateTile(x, y, board.tiles[x][y]);
       }
     }
   }
 
-  Tile updateTile(int x, int y, Tile tile) {
+  Tile _updateTile(int x, int y, Tile tile) {
     switch (tile.runtimeType) {
       case Arrow:
         Arrow arrow = tile as Arrow;
@@ -143,7 +148,12 @@ class Game {
 
       case Generator:
         Generator generator = tile as Generator;
-        generate(x, y, generator.direction);
+        Entity e = _generate(generator.direction, x, y);
+
+        if (e != null) {
+          int newKey = (entities.lastKey() ?? 0) + 1;
+          entities[newKey] = e;
+        }
         return tile;
         break;
 
@@ -156,27 +166,60 @@ class Game {
     }
   }
 
-  void generate(int x, int y, Direction direction) {
-    if (entities.length >= 200) {
-      return;
+  Entity _generate(Direction direction, int x, int y) {
+    if (entities.length >= 150) {
+      return null;
     }
 
-    // 5 good for mouse mania
-    // 2 for regular
-    if (rng.nextInt(100) < 2) {
-      int newKey = (entities.lastKey() ?? 0) + 1;
+    BoardPosition position = BoardPosition.centered(x, y, direction);
 
-      if (rng.nextInt(100) < 2) {
-        entities[newKey] =
-            GoldenMouse(position: BoardPosition.centered(x, y, direction));
-      } else {
-        entities[newKey] =
-            Mouse(position: BoardPosition.centered(x, y, direction));
-      }
+    switch (generatorPolicy) {
+      case GeneratorPolicy.Regular:
+        if (_rng.nextInt(100) < 2) {
+          if (_livingCats <= 0) {
+            _livingCats++;
+            return Cat(position: position);
+          }
+
+          if (_rng.nextInt(100) == 1) {
+            return GoldenMouse(position: position);
+          } else if (_rng.nextInt(100) == 2) {
+            return SpecialMouse(position: position);
+          } else {
+            return Mouse(position: position);
+          }
+        }
+        break;
+
+      case GeneratorPolicy.MouseMania:
+        if (_rng.nextInt(100) < 5) {
+          if (_rng.nextInt(100) < 1) {
+            return GoldenMouse(position: position);
+          } else {
+            return Mouse(position: position);
+          }
+        }
+        break;
+
+      case GeneratorPolicy.Challenge:
+        if (_rng.nextInt(100) < 2) {
+          if (_livingCats <= 0) {
+            _livingCats++;
+            return Cat(position: position);
+          }
+
+          return Mouse(position: position);
+        }
+        break;
+
+      default:
+        break;
     }
+
+    return null;
   }
 
-  Entity applyTileEffect(Entity e) {
+  Entity _applyTileEffect(Entity e) {
     Tile tile = board.tiles[e.position.x][e.position.y];
 
     switch (tile.runtimeType) {
@@ -234,22 +277,24 @@ class Game {
     }
   }
 
-  void moveEntities() {
+  void _moveEntities() {
     SplayTreeMap<int, Entity> newEntities = SplayTreeMap();
 
     entities.forEach((int i, Entity e) {
-      Entity ne = applyTileEffect(e);
+      Entity ne = _applyTileEffect(e);
 
       if (ne != null) {
-        ne.position = moveTick(ne.position, ne.moveSpeed());
+        ne.position = _moveTick(ne.position, ne.moveSpeed());
         newEntities[i] = ne;
+      } else if (e is Cat) {
+        _livingCats--;
       }
     });
 
     entities = newEntities;
   }
 
-  BoardPosition moveTick(BoardPosition e, int moveSpeed) {
+  BoardPosition _moveTick(BoardPosition e, int moveSpeed) {
     int x = e.x;
     int y = e.y;
     Direction front = e.direction;
@@ -324,7 +369,7 @@ class Game {
     return BoardPosition(x, y, front, step);
   }
 
-  double xBlend(Entity entity) {
+  double _xBlend(Entity entity) {
     double xBlend = entity.position.x.toDouble();
 
     switch (entity.position.direction) {
@@ -345,7 +390,7 @@ class Game {
     return xBlend;
   }
 
-  double yBlend(Entity entity) {
+  double _yBlend(Entity entity) {
     double yBlend = entity.position.y.toDouble();
 
     switch (entity.position.direction) {
@@ -366,12 +411,12 @@ class Game {
     return yBlend;
   }
 
-  bool colliding(Entity a, Entity b) {
-    double axBlend = xBlend(a);
-    double ayBlend = yBlend(a);
+  bool _colliding(Entity a, Entity b) {
+    double axBlend = _xBlend(a);
+    double ayBlend = _yBlend(a);
 
-    double bxBlend = xBlend(b);
-    double byBlend = yBlend(b);
+    double bxBlend = _xBlend(b);
+    double byBlend = _yBlend(b);
 
     double dist = pow(axBlend - bxBlend, 2) + pow(ayBlend - byBlend, 2);
 
@@ -379,6 +424,12 @@ class Game {
       return true;
     }
 
+    return false;
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    if (runtimeType != other.runtimeType) return false;
     return false;
   }
 }
