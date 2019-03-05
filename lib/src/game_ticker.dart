@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 import 'package:nyanya_rocket_base/nyanya_rocket_base.dart';
 
+enum GameSpeed { Normal, Fast, Slow }
+
 class GameTicker {
   static const Duration tickPeriod = Duration(milliseconds: 16);
 
@@ -11,7 +13,7 @@ class GameTicker {
   Timer _timer;
 
   bool running = false;
-  bool faster = false;
+  GameSpeed speed = GameSpeed.Normal;
 
   Duration _pauseDuration = Duration.zero;
 
@@ -57,11 +59,20 @@ class GameTicker {
       beforeTick();
 
       _game.tick();
-      _game.tick();
 
-      if (faster) {
-        _game.tick();
-        _game.tick();
+      switch (speed) {
+        case GameSpeed.Normal:
+          _game.tick();
+          break;
+
+        case GameSpeed.Fast:
+          _game.tick();
+          _game.tick();
+          _game.tick();
+          break;
+
+        case GameSpeed.Slow:
+          break;
       }
 
       afterTick();
