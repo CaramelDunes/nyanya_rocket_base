@@ -42,7 +42,7 @@ enum MessageTypes {
   PlaceArrow, // Type - x - y - direction index
 }
 
-class GameServer extends GameTicker {
+class GameServer extends MultiplayerGameTicker {
   final int nbPlayer;
 
   RawDatagramSocket _socket;

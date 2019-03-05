@@ -23,13 +23,7 @@ enum GameEvent {
   MouseMonopoly,
 }
 
-enum GeneratorPolicy {
-  Regular,
-  Challenge,
-  MouseMania,
-  CatAttack,
-  MouseMonopoly
-}
+enum GeneratorPolicy { Regular, Challenge, MouseMania, CatMania, MouseMonopoly }
 
 class Game {
   List<int> _scores = List.filled(4, 0, growable: false);
@@ -111,6 +105,7 @@ class Game {
             if (onMouseEaten != null) {
               onMouseEaten(e, cat);
             }
+
             break;
           }
         }
@@ -201,6 +196,13 @@ class Game {
         }
         break;
 
+      case GeneratorPolicy.CatMania:
+        if (_livingCats < 4) {
+          _livingCats++;
+          return Cat(position: position);
+        }
+        break;
+
       case GeneratorPolicy.Challenge:
         if (_rng.nextInt(100) < 2) {
           if (_livingCats <= 0) {
@@ -238,10 +240,7 @@ class Game {
             _scores[rocket.player.index] -= _scores[rocket.player.index] ~/ 3;
           } else if (e is GoldenMouse) {
             _scores[rocket.player.index] += 50;
-          } else if (e is SpecialMouse) {
-            // TODO Handle game events
-            _scores[rocket.player.index]++;
-          } else if (e is Mouse) {
+          } else { // Special and Regular mice
             _scores[rocket.player.index]++;
           }
 

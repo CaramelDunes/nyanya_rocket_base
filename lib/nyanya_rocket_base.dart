@@ -4,4 +4,5 @@ export 'src/entity.dart';
 export 'src/tile.dart';
 export 'src/game_ticker.dart';
 export 'src/game_server.dart';
+export 'src/multiplayer_game_ticker.dart';
 export 'src/protocol/game_server.pb.dart';
