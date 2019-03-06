@@ -10,7 +10,46 @@ class MultiplayerGameTicker extends GameTicker {
 
   GameEvent _scheduledEvent = GameEvent.None;
 
+  final List<List<ArrowPosition>> placedArrows =
+      List.generate(4, (_) => List(), growable: false);
+
   MultiplayerGameTicker(Game game) : super(game);
+
+  bool placeArrow(int x, int y, PlayerColor player, Direction direction) {
+    if (running && game.board.tiles[x][y] is Empty) {
+      int count = 0;
+      ArrowPosition last;
+      int lastExpiration = Arrow.defaultExpiration;
+
+      for (int i = 0; i < Board.width; i++) {
+        // TODO Get rid of that ugly thing
+        for (int j = 0; j < Board.height; j++) {
+          if (game.board.tiles[i][j] is Arrow) {
+            Arrow arrow = game.board.tiles[i][j] as Arrow;
+            if (player == arrow.player) {
+              count++;
+
+              if (arrow.expiration < lastExpiration) {
+                last = ArrowPosition(i, j);
+                lastExpiration = arrow.expiration;
+              }
+            }
+          }
+        }
+      }
+
+      if (count >= 3) {
+        game.board.tiles[last.x][last.y] = Empty();
+      }
+
+      game.board.tiles[x][y] = Arrow(player: player, direction: direction);
+      placedArrows[player.index].add(ArrowPosition(x, y));
+
+      return true;
+    }
+
+    return false;
+  }
 
   @override
   void onEntityInRocket(Entity entity, int x, int y) {

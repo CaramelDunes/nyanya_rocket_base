@@ -140,35 +140,7 @@ class GameServer extends MultiplayerGameTicker {
           int y = msg.y;
           Direction direction = Direction.values[msg.direction.value];
 
-          if (game.board.tiles[x][y] is Empty) {
-            int count = 0;
-            ArrowPosition last;
-            int lastExpiration = Arrow.defaultExpiration;
-
-            for (int i = 0; i < Board.width; i++) {
-              // TODO Get rid of that ugly thing
-              for (int j = 0; j < Board.height; j++) {
-                if (game.board.tiles[i][j] is Arrow) {
-                  Arrow arrow = game.board.tiles[i][j] as Arrow;
-                  if (player.color == arrow.player) {
-                    count++;
-
-                    if (arrow.expiration < lastExpiration) {
-                      last = ArrowPosition(i, j);
-                      lastExpiration = arrow.expiration;
-                    }
-                  }
-                }
-              }
-            }
-
-            if (count >= 3) {
-              game.board.tiles[last.x][last.y] = Empty();
-            }
-
-            game.board.tiles[x][y] =
-                Arrow(player: player.color, direction: direction);
-          }
+          placeArrow(x, y, player.color, direction);
         }
         break;
 
