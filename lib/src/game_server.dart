@@ -72,6 +72,8 @@ class GameServer extends MultiplayerGameTicker {
 
   @override
   void afterTick() {
+    super.afterTick();
+
     ProtocolGame state = game.toGameState();
     state.timestamp = _timestamp++;
     _builder.addByte(MessageTypes.GameState.index);

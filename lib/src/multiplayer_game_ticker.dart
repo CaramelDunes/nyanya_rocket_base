@@ -60,6 +60,7 @@ class MultiplayerGameTicker extends GameTicker {
   }
 
   @override
+  @mustCallSuper
   void afterTick() {
     if (_eventTickDuration > 1) {
       _eventTickDuration--;
