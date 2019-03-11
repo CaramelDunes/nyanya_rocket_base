@@ -23,9 +23,6 @@ class ProtocolDirection extends $pb.ProtobufEnum {
 
   static final Map<int, ProtocolDirection> _byValue = $pb.ProtobufEnum.initByValue(values);
   static ProtocolDirection valueOf(int value) => _byValue[value];
-  static void $checkItem(ProtocolDirection v) {
-    if (v is! ProtocolDirection) $pb.checkItemFailed(v, 'ProtocolDirection');
-  }
 
   const ProtocolDirection._(int v, String n) : super(v, n);
 }
@@ -45,9 +42,6 @@ class ProtocolPlayerColor extends $pb.ProtobufEnum {
 
   static final Map<int, ProtocolPlayerColor> _byValue = $pb.ProtobufEnum.initByValue(values);
   static ProtocolPlayerColor valueOf(int value) => _byValue[value];
-  static void $checkItem(ProtocolPlayerColor v) {
-    if (v is! ProtocolPlayerColor) $pb.checkItemFailed(v, 'ProtocolPlayerColor');
-  }
 
   const ProtocolPlayerColor._(int v, String n) : super(v, n);
 }
@@ -67,9 +61,6 @@ class ProtocolWall extends $pb.ProtobufEnum {
 
   static final Map<int, ProtocolWall> _byValue = $pb.ProtobufEnum.initByValue(values);
   static ProtocolWall valueOf(int value) => _byValue[value];
-  static void $checkItem(ProtocolWall v) {
-    if (v is! ProtocolWall) $pb.checkItemFailed(v, 'ProtocolWall');
-  }
 
   const ProtocolWall._(int v, String n) : super(v, n);
 }
@@ -91,9 +82,6 @@ class ProtocolTileType extends $pb.ProtobufEnum {
 
   static final Map<int, ProtocolTileType> _byValue = $pb.ProtobufEnum.initByValue(values);
   static ProtocolTileType valueOf(int value) => _byValue[value];
-  static void $checkItem(ProtocolTileType v) {
-    if (v is! ProtocolTileType) $pb.checkItemFailed(v, 'ProtocolTileType');
-  }
 
   const ProtocolTileType._(int v, String n) : super(v, n);
 }
@@ -113,10 +101,34 @@ class ProtocolEntityType extends $pb.ProtobufEnum {
 
   static final Map<int, ProtocolEntityType> _byValue = $pb.ProtobufEnum.initByValue(values);
   static ProtocolEntityType valueOf(int value) => _byValue[value];
-  static void $checkItem(ProtocolEntityType v) {
-    if (v is! ProtocolEntityType) $pb.checkItemFailed(v, 'ProtocolEntityType');
-  }
 
   const ProtocolEntityType._(int v, String n) : super(v, n);
+}
+
+class ProtocolGameEvent extends $pb.ProtobufEnum {
+  static const ProtocolGameEvent NO_EVENT = const ProtocolGameEvent._(0, 'NO_EVENT');
+  static const ProtocolGameEvent MOUSE_MANIA = const ProtocolGameEvent._(1, 'MOUSE_MANIA');
+  static const ProtocolGameEvent CAT_MANIA = const ProtocolGameEvent._(2, 'CAT_MANIA');
+  static const ProtocolGameEvent SPEED_UP = const ProtocolGameEvent._(3, 'SPEED_UP');
+  static const ProtocolGameEvent SLOW_DOWN = const ProtocolGameEvent._(4, 'SLOW_DOWN');
+  static const ProtocolGameEvent PLACE_AGAIN = const ProtocolGameEvent._(5, 'PLACE_AGAIN');
+  static const ProtocolGameEvent CAT_ATTACK = const ProtocolGameEvent._(6, 'CAT_ATTACK');
+  static const ProtocolGameEvent MOUSE_MONOPOLY = const ProtocolGameEvent._(7, 'MOUSE_MONOPOLY');
+
+  static const List<ProtocolGameEvent> values = const <ProtocolGameEvent> [
+    NO_EVENT,
+    MOUSE_MANIA,
+    CAT_MANIA,
+    SPEED_UP,
+    SLOW_DOWN,
+    PLACE_AGAIN,
+    CAT_ATTACK,
+    MOUSE_MONOPOLY,
+  ];
+
+  static final Map<int, ProtocolGameEvent> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static ProtocolGameEvent valueOf(int value) => _byValue[value];
+
+  const ProtocolGameEvent._(int v, String n) : super(v, n);
 }
 

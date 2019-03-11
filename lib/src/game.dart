@@ -63,6 +63,8 @@ class Game {
     });
 
     _scores = gameState.scores;
+
+    currentEvent = GameEvent.values[gameState.event.value];
   }
 
   ProtocolGame toGameState() {
@@ -72,6 +74,8 @@ class Game {
     _scores.forEach((int score) => g.scores.add(score));
     entities
         .forEach((int, Entity entity) => g.entities.add(entity.toPbEntity()));
+
+    g.event = ProtocolGameEvent.values[currentEvent.index];
 
     return g;
   }
@@ -240,7 +244,8 @@ class Game {
             _scores[rocket.player.index] -= _scores[rocket.player.index] ~/ 3;
           } else if (e is GoldenMouse) {
             _scores[rocket.player.index] += 50;
-          } else { // Special and Regular mice
+          } else {
+            // Special and Regular mice
             _scores[rocket.player.index]++;
           }
 

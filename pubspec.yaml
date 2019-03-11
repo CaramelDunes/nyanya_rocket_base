@@ -1,14 +1,14 @@
 name: nyanya_rocket_base
-description: NyaNya rocket base package.
+description: NyaNya Rocket! base package.
 version: 0.0.1
 author: CaramelDunes
-homepage: https://carameldunes.fr
+homepage: https://github.com/CaramelDunes/nyanya_rocket_base
 
 environment:
-  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+  sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
-  protobuf: ^0.13.3
+  protobuf: ^0.13.4
 
 dev_dependencies:
   test: ^1.5.1+1

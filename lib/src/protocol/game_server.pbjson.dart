@@ -55,6 +55,20 @@ const ProtocolEntityType$json = const {
   ],
 };
 
+const ProtocolGameEvent$json = const {
+  '1': 'ProtocolGameEvent',
+  '2': const [
+    const {'1': 'NO_EVENT', '2': 0},
+    const {'1': 'MOUSE_MANIA', '2': 1},
+    const {'1': 'CAT_MANIA', '2': 2},
+    const {'1': 'SPEED_UP', '2': 3},
+    const {'1': 'SLOW_DOWN', '2': 4},
+    const {'1': 'PLACE_AGAIN', '2': 5},
+    const {'1': 'CAT_ATTACK', '2': 6},
+    const {'1': 'MOUSE_MONOPOLY', '2': 7},
+  ],
+};
+
 const PlaceArrowMessage$json = const {
   '1': 'PlaceArrowMessage',
   '2': const [
@@ -115,6 +129,7 @@ const ProtocolGame$json = const {
     const {'1': 'board', '3': 2, '4': 1, '5': 11, '6': '.ProtocolBoard', '10': 'board'},
     const {'1': 'entities', '3': 3, '4': 3, '5': 11, '6': '.ProtocolEntity', '10': 'entities'},
     const {'1': 'scores', '3': 4, '4': 3, '5': 13, '10': 'scores'},
+    const {'1': 'event', '3': 5, '4': 1, '5': 14, '6': '.ProtocolGameEvent', '10': 'event'},
   ],
 };
 

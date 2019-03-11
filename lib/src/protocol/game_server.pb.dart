@@ -32,9 +32,6 @@ class PlaceArrowMessage extends $pb.GeneratedMessage {
   static $pb.PbList<PlaceArrowMessage> createRepeated() => new $pb.PbList<PlaceArrowMessage>();
   static PlaceArrowMessage getDefault() => _defaultInstance ??= create()..freeze();
   static PlaceArrowMessage _defaultInstance;
-  static void $checkItem(PlaceArrowMessage v) {
-    if (v is! PlaceArrowMessage) $pb.checkItemFailed(v, _i.qualifiedMessageName);
-  }
 
   int get x => $_get(0, 0);
   set x(int v) { $_setUnsignedInt32(0, v); }
@@ -69,9 +66,6 @@ class RegisterMessage extends $pb.GeneratedMessage {
   static $pb.PbList<RegisterMessage> createRepeated() => new $pb.PbList<RegisterMessage>();
   static RegisterMessage getDefault() => _defaultInstance ??= create()..freeze();
   static RegisterMessage _defaultInstance;
-  static void $checkItem(RegisterMessage v) {
-    if (v is! RegisterMessage) $pb.checkItemFailed(v, _i.qualifiedMessageName);
-  }
 
   String get nickname => $_getS(0, '');
   set nickname(String v) { $_setString(0, v); }
@@ -97,9 +91,6 @@ class RegisterSuccessMessage extends $pb.GeneratedMessage {
   static $pb.PbList<RegisterSuccessMessage> createRepeated() => new $pb.PbList<RegisterSuccessMessage>();
   static RegisterSuccessMessage getDefault() => _defaultInstance ??= create()..freeze();
   static RegisterSuccessMessage _defaultInstance;
-  static void $checkItem(RegisterSuccessMessage v) {
-    if (v is! RegisterSuccessMessage) $pb.checkItemFailed(v, _i.qualifiedMessageName);
-  }
 
   ProtocolPlayerColor get givenColor => $_getN(0);
   set givenColor(ProtocolPlayerColor v) { setField(1, v); }
@@ -132,9 +123,6 @@ class ProtocolTile extends $pb.GeneratedMessage {
   static $pb.PbList<ProtocolTile> createRepeated() => new $pb.PbList<ProtocolTile>();
   static ProtocolTile getDefault() => _defaultInstance ??= create()..freeze();
   static ProtocolTile _defaultInstance;
-  static void $checkItem(ProtocolTile v) {
-    if (v is! ProtocolTile) $pb.checkItemFailed(v, _i.qualifiedMessageName);
-  }
 
   ProtocolTileType get type => $_getN(0);
   set type(ProtocolTileType v) { setField(1, v); }
@@ -159,8 +147,8 @@ class ProtocolTile extends $pb.GeneratedMessage {
 
 class ProtocolBoard extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = new $pb.BuilderInfo('ProtocolBoard')
-    ..pp<ProtocolWall>(1, 'walls', $pb.PbFieldType.PE, ProtocolWall.$checkItem, null, ProtocolWall.valueOf, ProtocolWall.values)
-    ..pp<ProtocolTile>(2, 'tiles', $pb.PbFieldType.PM, ProtocolTile.$checkItem, ProtocolTile.create)
+    ..pc<ProtocolWall>(1, 'walls', $pb.PbFieldType.PE, null, ProtocolWall.valueOf, ProtocolWall.values)
+    ..pc<ProtocolTile>(2, 'tiles', $pb.PbFieldType.PM,ProtocolTile.create)
     ..hasRequiredFields = false
   ;
 
@@ -175,9 +163,6 @@ class ProtocolBoard extends $pb.GeneratedMessage {
   static $pb.PbList<ProtocolBoard> createRepeated() => new $pb.PbList<ProtocolBoard>();
   static ProtocolBoard getDefault() => _defaultInstance ??= create()..freeze();
   static ProtocolBoard _defaultInstance;
-  static void $checkItem(ProtocolBoard v) {
-    if (v is! ProtocolBoard) $pb.checkItemFailed(v, _i.qualifiedMessageName);
-  }
 
   List<ProtocolWall> get walls => $_getList(0);
 
@@ -205,9 +190,6 @@ class ProtocolEntity extends $pb.GeneratedMessage {
   static $pb.PbList<ProtocolEntity> createRepeated() => new $pb.PbList<ProtocolEntity>();
   static ProtocolEntity getDefault() => _defaultInstance ??= create()..freeze();
   static ProtocolEntity _defaultInstance;
-  static void $checkItem(ProtocolEntity v) {
-    if (v is! ProtocolEntity) $pb.checkItemFailed(v, _i.qualifiedMessageName);
-  }
 
   ProtocolEntityType get type => $_getN(0);
   set type(ProtocolEntityType v) { setField(1, v); }
@@ -239,8 +221,9 @@ class ProtocolGame extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = new $pb.BuilderInfo('ProtocolGame')
     ..a<int>(1, 'timestamp', $pb.PbFieldType.OU3)
     ..a<ProtocolBoard>(2, 'board', $pb.PbFieldType.OM, ProtocolBoard.getDefault, ProtocolBoard.create)
-    ..pp<ProtocolEntity>(3, 'entities', $pb.PbFieldType.PM, ProtocolEntity.$checkItem, ProtocolEntity.create)
+    ..pc<ProtocolEntity>(3, 'entities', $pb.PbFieldType.PM,ProtocolEntity.create)
     ..p<int>(4, 'scores', $pb.PbFieldType.PU3)
+    ..e<ProtocolGameEvent>(5, 'event', $pb.PbFieldType.OE, ProtocolGameEvent.NO_EVENT, ProtocolGameEvent.valueOf, ProtocolGameEvent.values)
     ..hasRequiredFields = false
   ;
 
@@ -255,9 +238,6 @@ class ProtocolGame extends $pb.GeneratedMessage {
   static $pb.PbList<ProtocolGame> createRepeated() => new $pb.PbList<ProtocolGame>();
   static ProtocolGame getDefault() => _defaultInstance ??= create()..freeze();
   static ProtocolGame _defaultInstance;
-  static void $checkItem(ProtocolGame v) {
-    if (v is! ProtocolGame) $pb.checkItemFailed(v, _i.qualifiedMessageName);
-  }
 
   int get timestamp => $_get(0, 0);
   set timestamp(int v) { $_setUnsignedInt32(0, v); }
@@ -272,5 +252,10 @@ class ProtocolGame extends $pb.GeneratedMessage {
   List<ProtocolEntity> get entities => $_getList(2);
 
   List<int> get scores => $_getList(3);
+
+  ProtocolGameEvent get event => $_getN(4);
+  set event(ProtocolGameEvent v) { setField(5, v); }
+  bool hasEvent() => $_has(4);
+  void clearEvent() => clearField(5);
 }
 
