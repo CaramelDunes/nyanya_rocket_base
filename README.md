@@ -1,14 +1,11 @@
-# nyanya_rocket_base
+# NyaNya Rocket! base package
 
-A new Flutter package project.
+This repository contains NyaNya Rocket! base package, used by the mobile application and the (future) dedicated game server.
 
-## Getting Started
+## Contributing
+Contributions are welcome, see the contributing section of the NyaNya Rocket! repository.
 
-This project is a starting point for a Dart
-[package](https://flutter.io/developing-packages/),
-a library module containing code that can be shared easily across
-multiple Flutter or Dart projects.
+## License
+Licensed under Attribution-NonCommercial-ShareAlike 4.0 International
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.io/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+See LICENSE for more information.
