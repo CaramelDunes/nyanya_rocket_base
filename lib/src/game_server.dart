@@ -122,10 +122,7 @@ class GameServer extends MultiplayerGameTicker {
               _socket.send(_builder.toBytes(), key.address, key.port));
           _builder.clear();
 
-          if (_players.length <= nbPlayer) {
-            // FIXME Debug condition
-            running = true;
-          }
+          running = _players.length == nbPlayer;
         }
         break;
 
