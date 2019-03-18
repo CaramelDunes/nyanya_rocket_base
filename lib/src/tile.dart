@@ -78,7 +78,8 @@ abstract class Tile {
       case ProtocolTileType.ARROW:
         t = Arrow(
             player: PlayerColor.values[tile.owner.value],
-            direction: Direction.values[tile.direction.value]);
+            direction: Direction.values[tile.direction.value],
+            full: !tile.damagedOrDeparted);
         break;
 
       case ProtocolTileType.GENERATOR:
@@ -153,7 +154,8 @@ class Arrow extends Tile {
   ProtocolTile toPbTile() => ProtocolTile()
     ..type = ProtocolTileType.ARROW
     ..owner = ProtocolPlayerColor.values[player.index]
-    ..direction = ProtocolDirection.values[direction.index];
+    ..direction = ProtocolDirection.values[direction.index]
+    ..damagedOrDeparted = !full;
 }
 
 class Pit extends Tile {
