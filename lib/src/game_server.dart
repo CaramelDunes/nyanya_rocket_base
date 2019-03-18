@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:meta/meta.dart';
@@ -51,10 +50,7 @@ class GameServer extends MultiplayerGameTicker {
   int _timestamp = 0;
 
   GameServer({@required Board board, @required this.nbPlayer})
-      : super(Game()
-          ..board = Board.fromJson(jsonDecode(
-            '{"tiles":[[{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0}],[{"type":0},{"type":3,"player":1},{"type":0},{"type":0},{"type":0},{"type":0},{"type":4, "direction":0},{"type":0},{"type":0}],[{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0}],[{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0}],[{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0}],[{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0}],[{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0}],[{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0}],[{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0}],[{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0}],[{"type":0},{"type":3,"player":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0}],[{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0},{"type":0}]],"walls":[[3,1,1,1,1,1,1,1,1],[2,2,0,0,0,0,0,1,2],[2,3,0,0,0,0,0,0,2],[2,2,0,0,0,0,0,1,2],[2,1,0,0,0,0,0,0,0],[2,3,0,0,0,0,0,0,2],[2,2,0,0,0,0,0,1,2],[2,1,0,0,0,0,0,0,0],[2,0,0,0,0,0,0,0,2],[2,2,0,0,0,0,0,1,2],[2,1,0,0,0,0,0,0,2],[2,0,0,0,0,0,0,1,0]]}',
-          ))) {
+      : super(Game()..board = board) {
     RawDatagramSocket.bind('0.0.0.0', 43210).then((RawDatagramSocket socket) {
       _socket = socket;
       _socket.listen(_handleSocketEvent);
