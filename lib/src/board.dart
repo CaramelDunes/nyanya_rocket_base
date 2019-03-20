@@ -17,34 +17,32 @@ enum Wall {
 
 class BoardPosition {
   static const int maxStep = 60;
-  static const int center = maxStep ~/ 2;
+  static const int centerStep = maxStep ~/ 2;
 
   final int x;
   final int y;
   final int step; // Between 0 and maxStep
   final Direction direction;
 
-  const BoardPosition(this.x, this.y, this.direction, this.step);
-  const BoardPosition.centered(this.x, this.y, this.direction) : step = center;
-  const BoardPosition.entering(this.x, this.y, this.direction) : step = 0;
+  const BoardPosition(this.x, this.y, this.direction, this.step)
+      : assert(0 <= step && step <= maxStep),
+        assert(0 <= x && x <= Board.width),
+        assert(0 <= y && y <= Board.height);
 
-  BoardPosition.copy(BoardPosition e)
-      : x = e.x,
-        y = e.y,
-        step = e.step,
-        direction = e.direction;
+  const BoardPosition.centered(int x, int y, Direction direction)
+      : this(x, y, direction, centerStep);
+
+  BoardPosition.copy(BoardPosition e) : this(e.x, e.y, e.direction, e.step);
+
+  BoardPosition.fromJson(Map<String, dynamic> parsedJson)
+      : this.centered(parsedJson['x'], parsedJson['y'],
+            Direction.values[parsedJson['direction']]);
 
   BoardPosition withDirection(Direction newDirection) =>
       BoardPosition(x, y, newDirection, step);
 
-  BoardPosition.fromJson(Map<String, dynamic> parsedJson)
-      : x = parsedJson['x'],
-        y = parsedJson['y'],
-        step = parsedJson['step'],
-        direction = Direction.values[parsedJson['direction']];
-
   Map<String, dynamic> toJson() =>
-      {'x': x, 'y': y, 'step': step, 'direction': direction.index};
+      {'x': x, 'y': y, 'direction': direction.index};
 }
 
 class Board {
@@ -68,6 +66,7 @@ class Board {
 
   factory Board.copy(Board b) {
     Board board = Board();
+
     for (int i = 0; i < width; i++) {
       for (int j = 0; j < height; j++) {
         board.tiles[i][j] = b.tiles[i][j];
@@ -200,8 +199,8 @@ class Board {
     }
   }
 
-  bool hasWall(Direction dir, int x, int y) {
-    switch (dir) {
+  bool hasWall(Direction direction, int x, int y) {
+    switch (direction) {
       case Direction.Right:
         return hasRightWall(x, y);
         break;
@@ -224,8 +223,8 @@ class Board {
     }
   }
 
-  void setWall(int x, int y, Direction dir, [bool set = true]) {
-    switch (dir) {
+  void setWall(int x, int y, Direction direction, [bool set = true]) {
+    switch (direction) {
       case Direction.Right:
         setRightWall(x, y, set);
         break;
@@ -245,11 +244,5 @@ class Board {
       default:
         break;
     }
-  }
-
-  void removeWalls(int x, int y) {
-    walls[x][y] = Wall.None;
-    setRightWall(x, y, false);
-    setDownWall(x, y, false);
   }
 }
