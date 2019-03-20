@@ -28,7 +28,7 @@ enum GeneratorPolicy { Regular, Challenge, MouseMania, CatMania, MouseMonopoly }
 class Game {
   List<int> _scores = List.filled(4, 0, growable: false);
   Board board = Board();
-  SplayTreeMap<int, Entity> entities = SplayTreeMap();
+  Queue<Entity> entities = Queue();
   GameEvent currentEvent = GameEvent.None;
   GeneratorPolicy generatorPolicy = GeneratorPolicy.Regular;
   Random _rng = Random();
@@ -43,23 +43,20 @@ class Game {
 
   Game.fromJson(Map<String, dynamic> parsedJson) {
     board = Board.fromJson(parsedJson['board']);
-    entities = SplayTreeMap.from(parsedJson['entities'].map<int, Entity>(
-        (String id, dynamic entity) =>
-            MapEntry<int, Entity>(int.parse(id), Entity.fromJson(entity))));
+    entities = Queue.from(parsedJson['entities']
+        .map<Entity>((dynamic entity) => Entity.fromJson(entity)));
   }
 
   Map<String, dynamic> toJson() => {
         'board': board.toJson(),
-        'entities': entities.map((int id, Entity entity) =>
-            MapEntry<String, dynamic>(id.toString(), entity.toJson())),
+        'entities': entities.map((Entity entity) => entity.toJson()).toList(),
       };
 
   Game.fromProtocolGame(ProtocolGame gameState) {
     board = Board.fromPbBoard(gameState.board);
 
     gameState.entities.forEach((ProtocolEntity entity) {
-      int newKey = (entities.lastKey() ?? 0) + 1;
-      entities[newKey] = Entity.fromPbEntity(entity);
+      entities.add(Entity.fromPbEntity(entity));
     });
 
     _scores = gameState.scores;
@@ -72,8 +69,7 @@ class Game {
 
     g.board = board.toPbBoard();
     _scores.forEach((int score) => g.scores.add(score));
-    entities
-        .forEach((int, Entity entity) => g.entities.add(entity.toPbEntity()));
+    entities.forEach((Entity entity) => g.entities.add(entity.toPbEntity()));
 
     g.event = ProtocolGameEvent.values[currentEvent.index];
 
@@ -90,16 +86,16 @@ class Game {
   void _tickEntities() {
     _moveEntities();
 
-    List<Cat> cats = List();
-    entities.forEach((int i, Entity e) {
+    Queue<Cat> cats = Queue();
+    entities.forEach((Entity e) {
       if (e is Cat) {
         cats.add(e);
       }
     });
 
-    SplayTreeMap<int, Entity> newEntities = SplayTreeMap();
+    Queue<Entity> newEntities = Queue();
 
-    entities.forEach((int i, Entity e) {
+    entities.forEach((Entity e) {
       bool dead = false;
       if (e is Mouse) {
         for (Cat cat in cats) {
@@ -116,7 +112,7 @@ class Game {
       }
 
       if (!dead) {
-        newEntities[i] = e;
+        newEntities.add(e);
       }
     });
 
@@ -150,8 +146,7 @@ class Game {
         Entity e = _generate(generator.direction, x, y);
 
         if (e != null) {
-          int newKey = (entities.lastKey() ?? 0) + 1;
-          entities[newKey] = e;
+          entities.add(e);
         }
         return tile;
         break;
@@ -282,14 +277,14 @@ class Game {
   }
 
   void _moveEntities() {
-    SplayTreeMap<int, Entity> newEntities = SplayTreeMap();
+    Queue<Entity> newEntities = Queue();
 
-    entities.forEach((int i, Entity e) {
+    entities.forEach((Entity e) {
       Entity ne = _applyTileEffect(e);
 
       if (ne != null) {
         ne.position = _moveTick(ne.position, ne.moveSpeed());
-        newEntities[i] = ne;
+        newEntities.add(ne);
       } else if (e is Cat) {
         _livingCats--;
       }
