@@ -111,6 +111,16 @@ class MultiplayerGameTicker extends GameTicker {
         break;
 
       case GameEvent.PlaceAgain:
+        // TODO Get rid of that ugly thing
+        for (int i = 0; i < Board.width; i++) {
+          for (int j = 0; j < Board.height; j++) {
+            if (game.board.tiles[i][j] is Arrow) {
+              game.board.tiles[i][j] = Empty();
+            }
+          }
+        }
+
+        placedArrows.forEach((List<ArrowPosition> list) => list.clear());
         break;
 
       case GameEvent.None:
