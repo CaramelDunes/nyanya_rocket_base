@@ -196,9 +196,11 @@ class Game {
         break;
 
       case GeneratorPolicy.CatMania:
-        if (_livingCats < 4) {
-          _livingCats++;
-          return Cat(position: position);
+        if (_rng.nextInt(100) < 2) {
+          if (_livingCats < 4) {
+            _livingCats++;
+            return Cat(position: position);
+          }
         }
         break;
 
