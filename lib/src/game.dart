@@ -32,7 +32,7 @@ class Game {
   GameEvent currentEvent = GameEvent.None;
   GeneratorPolicy generatorPolicy = GeneratorPolicy.Regular;
   Random _rng = Random();
-  int _livingCats = 0;
+  int livingCats = 0;
 
   MouseEatenCallback onMouseEaten;
   EntityInPitCallback onEntityInPit;
@@ -169,18 +169,18 @@ class Game {
 
     switch (generatorPolicy) {
       case GeneratorPolicy.Regular:
-        if (_rng.nextInt(100) < 2) {
-          if (_livingCats <= 0) {
-            _livingCats++;
+        if (_rng.nextInt(1000) < 20) {
+          if (livingCats <= 0) {
+            livingCats++;
             return Cat(position: position);
           }
 
-          if (_rng.nextInt(100) == 1) {
-            return GoldenMouse(position: position);
-          } else if (_rng.nextInt(100) == 2) {
-            return SpecialMouse(position: position);
-          } else {
+          if (_rng.nextInt(1000) >= 20) {
             return Mouse(position: position);
+          } else if (_rng.nextInt(1000) >= 10) {
+            return GoldenMouse(position: position);
+          } else {
+            return SpecialMouse(position: position);
           }
         }
         break;
@@ -197,8 +197,8 @@ class Game {
 
       case GeneratorPolicy.CatMania:
         if (_rng.nextInt(100) < 2) {
-          if (_livingCats < 4) {
-            _livingCats++;
+          if (livingCats < 4) {
+            livingCats++;
             return Cat(position: position);
           }
         }
@@ -206,8 +206,8 @@ class Game {
 
       case GeneratorPolicy.Challenge:
         if (_rng.nextInt(100) < 2) {
-          if (_livingCats <= 0) {
-            _livingCats++;
+          if (livingCats <= 0) {
+            livingCats++;
             return Cat(position: position);
           }
 
@@ -288,7 +288,7 @@ class Game {
         ne.position = _moveTick(ne.position, ne.moveSpeed());
         newEntities.add(ne);
       } else if (e is Cat) {
-        _livingCats--;
+        livingCats--;
       }
     });
 

@@ -9,6 +9,7 @@ class MultiplayerGameTicker extends GameTicker {
   int _eventTickDuration = 0;
 
   GameEvent _scheduledEvent = GameEvent.None;
+  PlayerColor _eventOrigin;
 
   final List<List<ArrowPosition>> placedArrows =
       List.generate(4, (_) => List(), growable: false);
@@ -56,6 +57,7 @@ class MultiplayerGameTicker extends GameTicker {
     if (entity is SpecialMouse) {
       _rng.nextInt(GameEvent.values.length);
       _scheduledEvent = GameEvent.values[_rng.nextInt(GameEvent.values.length)];
+      _eventOrigin = (game.board.tiles[x][y] as Rocket).player;
     }
   }
 
@@ -89,10 +91,16 @@ class MultiplayerGameTicker extends GameTicker {
       case GameEvent.CatMania:
         game.entities.clear();
         game.generatorPolicy = GeneratorPolicy.CatMania;
+        game.livingCats = 0;
         break;
 
       case GameEvent.MouseMania:
         game.generatorPolicy = GeneratorPolicy.MouseMania;
+        game.entities.removeWhere((Entity e) {
+          return e is Cat;
+        });
+
+        game.livingCats = 0;
         break;
 
       case GameEvent.SpeedUp:
@@ -108,6 +116,20 @@ class MultiplayerGameTicker extends GameTicker {
         break;
 
       case GameEvent.CatAttack:
+        for (int i = 0; i < Board.width; i++) {
+          for (int j = 0; j < Board.height; j++) {
+            if (game.board.tiles[i][j] is Rocket) {
+              Rocket r = game.board.tiles[i][j] as Rocket;
+
+              if (r.player != _eventOrigin) {
+                game.entities.add(Cat(
+                    position: BoardPosition.centered(i, j, Direction.Down)));
+              }
+            }
+          }
+        }
+
+        _eventTickDuration = 1; // 10 seconds
         break;
 
       case GameEvent.PlaceAgain:
@@ -121,6 +143,8 @@ class MultiplayerGameTicker extends GameTicker {
         }
 
         placedArrows.forEach((List<ArrowPosition> list) => list.clear());
+
+        _eventTickDuration = 1; // 10 seconds
         break;
 
       case GameEvent.None:
@@ -142,6 +166,7 @@ class MultiplayerGameTicker extends GameTicker {
       case GameEvent.CatMania:
         game.entities.clear();
         game.generatorPolicy = GeneratorPolicy.Regular;
+        game.livingCats = 0;
         break;
 
       case GameEvent.MouseMania:
