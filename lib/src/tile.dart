@@ -126,7 +126,11 @@ class Arrow extends Tile {
       : expiration = 600 * 1000000;
 
   Tile damaged() => full
-      ? Arrow(player: this.player, direction: this.direction, full: false)
+      ? Arrow(
+          player: this.player,
+          direction: this.direction,
+          full: false,
+          expiration: this.expiration)
       : Empty();
 
   Tile withExpiration(int expiration) => expiration <= 0
