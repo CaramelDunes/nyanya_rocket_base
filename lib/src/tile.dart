@@ -79,7 +79,9 @@ abstract class Tile {
         t = Arrow(
             player: PlayerColor.values[tile.owner.value],
             direction: Direction.values[tile.direction.value],
-            full: !tile.damagedOrDeparted);
+            halfTurnPower: tile.damagedOrDeparted
+                ? ArrowHalfTurnPower.OneCat
+                : ArrowHalfTurnPower.TwoCats);
         break;
 
       case ProtocolTileType.GENERATOR:
@@ -107,38 +109,40 @@ class Empty extends Tile {
   ProtocolTile toPbTile() => ProtocolTile()..type = ProtocolTileType.EMPTY;
 }
 
+enum ArrowHalfTurnPower { TwoCats, OneCat, ZeroCat }
+
 class Arrow extends Tile {
   static const int defaultExpiration = 1200;
 
   final PlayerColor player;
   final Direction direction;
-  final bool full;
+  final ArrowHalfTurnPower halfTurnPower;
   final int expiration; // Default is 10s
 
   const Arrow(
       {@required this.player,
       @required this.direction,
-      this.full = true,
+      this.halfTurnPower = ArrowHalfTurnPower.TwoCats,
       this.expiration = defaultExpiration});
 
-  const Arrow.notExpirable(
-      {@required this.player, @required this.direction, this.full = true})
-      : expiration = 600 * 1000000;
+  const Arrow.notExpirable({
+    @required this.player,
+    @required this.direction,
+    this.halfTurnPower = ArrowHalfTurnPower.TwoCats,
+  }) : expiration = 600 * 1000000;
 
-  Tile damaged() => full
-      ? Arrow(
-          player: this.player,
-          direction: this.direction,
-          full: false,
-          expiration: this.expiration)
-      : Empty();
+  Tile withHalfTurnPower(ArrowHalfTurnPower halfTurnPower) => Arrow(
+      player: this.player,
+      direction: this.direction,
+      halfTurnPower: halfTurnPower,
+      expiration: this.expiration);
 
   Tile withExpiration(int expiration) => expiration <= 0
       ? Empty()
       : Arrow(
           player: this.player,
           direction: this.direction,
-          full: this.full,
+          halfTurnPower: this.halfTurnPower,
           expiration: expiration);
 
   @override
@@ -151,7 +155,7 @@ class Arrow extends Tile {
   Arrow.fromJson(Map<String, dynamic> parsedJson)
       : player = PlayerColor.values[parsedJson['player']],
         direction = Direction.values[parsedJson['direction']],
-        full = true,
+        halfTurnPower = ArrowHalfTurnPower.TwoCats,
         expiration = 0;
 
   @override
@@ -159,7 +163,7 @@ class Arrow extends Tile {
     ..type = ProtocolTileType.ARROW
     ..owner = ProtocolPlayerColor.values[player.index]
     ..direction = ProtocolDirection.values[direction.index]
-    ..damagedOrDeparted = !full;
+    ..damagedOrDeparted = halfTurnPower != ArrowHalfTurnPower.OneCat;
 }
 
 class Pit extends Tile {

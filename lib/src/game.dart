@@ -1,6 +1,5 @@
-import 'dart:math';
-
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:nyanya_rocket_base/src/board.dart';
 import 'package:nyanya_rocket_base/src/entity.dart';
@@ -222,7 +221,7 @@ class Game {
     return null;
   }
 
-  Entity _applyTileEffect(Entity e) {
+  Entity _applyTileEffect(Entity e, List<BoardPosition> pendingArrowDeletions) {
     Tile tile = board.tiles[e.position.x][e.position.y];
 
     switch (tile.runtimeType) {
@@ -264,7 +263,23 @@ class Game {
           // Head-on collision with cat
           if (e is Cat &&
               (e.position.direction.index + 2) % 4 == arrow.direction.index) {
-            board.tiles[e.position.x][e.position.y] = arrow.damaged();
+            switch (arrow.halfTurnPower) {
+              case ArrowHalfTurnPower.ZeroCat:
+                return e;
+                break;
+
+              case ArrowHalfTurnPower.OneCat:
+                board.tiles[e.position.x][e.position.y] =
+                    arrow.withHalfTurnPower(ArrowHalfTurnPower.ZeroCat);
+                pendingArrowDeletions.add(BoardPosition.centered(
+                    e.position.x, e.position.y, Direction.Right));
+                break;
+
+              case ArrowHalfTurnPower.TwoCats:
+                board.tiles[e.position.x][e.position.y] =
+                    arrow.withHalfTurnPower(ArrowHalfTurnPower.OneCat);
+                break;
+            }
           }
 
           e.position = e.position.withDirection(arrow.direction);
@@ -280,9 +295,10 @@ class Game {
 
   void _moveEntities() {
     Queue<Entity> newEntities = Queue();
+    List<BoardPosition> pendingArrowDeletions = List();
 
     entities.forEach((Entity e) {
-      Entity ne = _applyTileEffect(e);
+      Entity ne = _applyTileEffect(e, pendingArrowDeletions);
 
       if (ne != null) {
         ne.position = _moveTick(ne.position, ne.moveSpeed());
@@ -293,6 +309,10 @@ class Game {
     });
 
     entities = newEntities;
+
+    pendingArrowDeletions.forEach((BoardPosition p) {
+      board.tiles[p.x][p.y] = Empty();
+    });
   }
 
   BoardPosition _moveTick(BoardPosition e, int moveSpeed) {
@@ -421,7 +441,7 @@ class Game {
 
     double dist = pow(axBlend - bxBlend, 2) + pow(ayBlend - byBlend, 2);
 
-    if (dist <= 0.25) {
+    if (dist <= 1 / 9) {
       return true;
     }
 
