@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:nyanya_rocket_base/src/board.dart';
-import 'package:nyanya_rocket_base/src/protocol/game_server.pb.dart';
+import 'package:nyanya_rocket_base/src/protocol/game_state.pb.dart' as protocol;
 
 enum TileType {
   Empty,
@@ -18,8 +18,8 @@ class PlayerColor {
   @override
   String toString() => 'PlayerColor.$index';
 
-  ProtocolPlayerColor toProtocolPlayerColor() =>
-      ProtocolPlayerColor.values[index];
+  protocol.PlayerColor toProtocolPlayerColor() =>
+      protocol.PlayerColor.values[index];
 
   static const Blue = const PlayerColor._internal(0);
   static const Yellow = const PlayerColor._internal(1);
@@ -63,19 +63,19 @@ abstract class Tile {
     return Empty();
   }
 
-  factory Tile.fromPbTile(ProtocolTile tile) {
+  factory Tile.fromPbTile(protocol.Tile tile) {
     Tile t;
 
     switch (tile.type) {
-      case ProtocolTileType.EMPTY:
+      case protocol.TileType.EMPTY:
         t = Empty();
         break;
 
-      case ProtocolTileType.ROCKET:
+      case protocol.TileType.ROCKET:
         t = Rocket(player: PlayerColor.values[tile.owner.value]);
         break;
 
-      case ProtocolTileType.ARROW:
+      case protocol.TileType.ARROW:
         t = Arrow(
             player: PlayerColor.values[tile.owner.value],
             direction: Direction.values[tile.direction.value],
@@ -84,7 +84,7 @@ abstract class Tile {
                 : ArrowHalfTurnPower.TwoCats);
         break;
 
-      case ProtocolTileType.GENERATOR:
+      case protocol.TileType.GENERATOR:
         t = Generator(direction: Direction.values[tile.direction.value]);
         break;
     }
@@ -94,7 +94,7 @@ abstract class Tile {
 
   Map<String, dynamic> toJson();
 
-  ProtocolTile toPbTile();
+  protocol.Tile toPbTile();
 }
 
 class Empty extends Tile {
@@ -106,7 +106,7 @@ class Empty extends Tile {
   }
 
   @override
-  ProtocolTile toPbTile() => ProtocolTile()..type = ProtocolTileType.EMPTY;
+  protocol.Tile toPbTile() => protocol.Tile()..type = protocol.TileType.EMPTY;
 }
 
 enum ArrowHalfTurnPower { TwoCats, OneCat, ZeroCat }
@@ -159,11 +159,11 @@ class Arrow extends Tile {
         expiration = 0;
 
   @override
-  ProtocolTile toPbTile() => ProtocolTile()
-    ..type = ProtocolTileType.ARROW
-    ..owner = ProtocolPlayerColor.values[player.index]
-    ..direction = ProtocolDirection.values[direction.index]
-    ..damagedOrDeparted = halfTurnPower != ArrowHalfTurnPower.OneCat;
+  protocol.Tile toPbTile() => protocol.Tile()
+    ..type = protocol.TileType.ARROW
+    ..owner = protocol.PlayerColor.values[player.index]
+    ..direction = protocol.Direction.values[direction.index]
+    ..damagedOrDeparted = halfTurnPower == ArrowHalfTurnPower.OneCat;
 }
 
 class Pit extends Tile {
@@ -174,7 +174,7 @@ class Pit extends Tile {
     };
   }
 
-  ProtocolTile toPbTile() => ProtocolTile()..type = ProtocolTileType.PIT;
+  protocol.Tile toPbTile() => protocol.Tile()..type = protocol.TileType.PIT;
 }
 
 class Rocket extends Tile {
@@ -196,9 +196,9 @@ class Rocket extends Tile {
         departed = false;
 
   @override
-  ProtocolTile toPbTile() => ProtocolTile()
-    ..type = ProtocolTileType.ROCKET
-    ..owner = ProtocolPlayerColor.values[player.index];
+  protocol.Tile toPbTile() => protocol.Tile()
+    ..type = protocol.TileType.ROCKET
+    ..owner = protocol.PlayerColor.values[player.index];
 }
 
 class Generator extends Tile {
@@ -216,7 +216,7 @@ class Generator extends Tile {
       : direction = Direction.values[parsedJson['direction']];
 
   @override
-  ProtocolTile toPbTile() => ProtocolTile()
-    ..type = ProtocolTileType.GENERATOR
-    ..direction = ProtocolDirection.values[direction.index];
+  protocol.Tile toPbTile() => protocol.Tile()
+    ..type = protocol.TileType.GENERATOR
+    ..direction = protocol.Direction.values[direction.index];
 }

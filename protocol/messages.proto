@@ -1,0 +1,30 @@
+syntax = "proto3";
+import "game_state.proto";
+
+message PlaceArrowMessage {
+    uint32 x = 1;
+    uint32 y = 2;
+    Direction direction = 3;
+}
+
+message RegisterMessage {
+    string nickname = 1;
+    uint32 ticket = 2;
+}
+
+message RegisterSuccessMessage {
+    PlayerColor givenColor = 1;
+    string nickname = 2;
+}
+
+message Capsule {
+    uint32 protocolId = 1;
+    uint32 sequenceId = 2;
+
+    oneof payload {
+        Game game = 3;
+        PlaceArrowMessage placeArrow = 4;
+        RegisterMessage register = 5;
+        RegisterSuccessMessage registerSuccess = 6;
+    }
+}

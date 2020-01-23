@@ -3,8 +3,10 @@ import 'dart:math';
 
 import 'package:nyanya_rocket_base/src/board.dart';
 import 'package:nyanya_rocket_base/src/entity.dart';
-import 'package:nyanya_rocket_base/src/protocol/game_server.pb.dart';
+import 'package:nyanya_rocket_base/src/protocol/game_state.pb.dart' as protocol;
+
 import 'package:nyanya_rocket_base/src/tile.dart';
+import 'package:nyanya_rocket_base/src/xor_shift.dart';
 
 typedef MouseEatenCallback = void Function(Mouse mouse, Cat cat);
 typedef EntityInPitCallback = void Function(Entity entity, int x, int y);
@@ -22,16 +24,24 @@ enum GameEvent {
   MouseMonopoly,
 }
 
-enum GeneratorPolicy { Regular, Challenge, MouseMania, CatMania, MouseMonopoly }
+enum GeneratorPolicy {
+  Regular,
+  Challenge,
+  MouseMania,
+  CatMania,
+  MouseMonopoly,
+  None,
+}
 
 class Game {
   List<int> _scores = List.filled(4, 0, growable: false);
   Board board = Board();
-  Queue<Entity> entities = Queue();
+  Queue<Cat> cats = Queue();
+  Queue<Mouse> mice = Queue();
   GameEvent currentEvent = GameEvent.None;
   GeneratorPolicy generatorPolicy = GeneratorPolicy.Regular;
-  Random _rng = Random();
-  int livingCats = 0;
+  XorShiftState _xorShiftState = XorShiftState.random();
+  int _tickCount = 0;
 
   MouseEatenCallback onMouseEaten;
   EntityInPitCallback onEntityInPit;
@@ -42,80 +52,102 @@ class Game {
 
   Game.fromJson(Map<String, dynamic> parsedJson) {
     board = Board.fromJson(parsedJson['board']);
-    entities = Queue.from(parsedJson['entities']
+    Queue<Entity> entities = Queue.from(parsedJson['entities']
         .map<Entity>((dynamic entity) => Entity.fromJson(entity)));
+
+    entities.forEach((Entity e) {
+      if (e is Cat) {
+        cats.add(e);
+      } else {
+        mice.add(e);
+      }
+    });
   }
 
   Map<String, dynamic> toJson() => {
         'board': board.toJson(),
-        'entities': entities.map((Entity entity) => entity.toJson()).toList(),
+        'entities': (cats).map((Entity entity) => entity.toJson()).toList() +
+            (mice).map((Entity entity) => entity.toJson()).toList(),
       };
 
-  Game.fromProtocolGame(ProtocolGame gameState) {
+  Game.fromProtocolGame(protocol.Game gameState) {
     board = Board.fromPbBoard(gameState.board);
 
-    gameState.entities.forEach((ProtocolEntity entity) {
-      entities.add(Entity.fromPbEntity(entity));
+    gameState.cats.forEach((protocol.Entity entity) {
+      cats.add(Entity.fromPbEntity(entity));
+    });
+
+    gameState.mice.forEach((protocol.Entity entity) {
+      mice.add(Entity.fromPbEntity(entity));
     });
 
     _scores = gameState.scores;
 
     currentEvent = GameEvent.values[gameState.event.value];
+    _tickCount = gameState.timestamp;
+    _xorShiftState.a = gameState.randomState.a;
+    _xorShiftState.b = gameState.randomState.b;
+    _xorShiftState.c = gameState.randomState.c;
+    _xorShiftState.d = gameState.randomState.d;
   }
 
-  ProtocolGame toGameState() {
-    ProtocolGame g = ProtocolGame();
+  protocol.Game toGameState() {
+    protocol.Game g = protocol.Game();
 
     g.board = board.toPbBoard();
     _scores.forEach((int score) => g.scores.add(score));
-    entities.forEach((Entity entity) => g.entities.add(entity.toPbEntity()));
+    cats.forEach((Cat cat) => g.cats.add(cat.toPbEntity()));
+    mice.forEach((Mouse mouse) => g.mice.add(mouse.toPbEntity()));
 
-    g.event = ProtocolGameEvent.values[currentEvent.index];
+    g.event = protocol.GameEvent.values[currentEvent.index];
+
+    g.timestamp = _tickCount;
+
+    g.randomState = protocol.XorShiftState();
+    g.randomState.a = _xorShiftState.a;
+    g.randomState.b = _xorShiftState.b;
+    g.randomState.c = _xorShiftState.c;
+    g.randomState.d = _xorShiftState.d;
 
     return g;
   }
 
   int scoreOf(PlayerColor player) => _scores[player.index];
 
+  int get tickCount => _tickCount;
+
   void tick() {
     _tickEntities();
     _tickTiles();
+
+    _tickCount++;
   }
 
   void _tickEntities() {
     _moveEntities();
 
-    Queue<Cat> cats = Queue();
-    entities.forEach((Entity e) {
-      if (e is Cat) {
-        cats.add(e);
-      }
-    });
+    Queue<Mouse> newMice = Queue();
 
-    Queue<Entity> newEntities = Queue();
-
-    entities.forEach((Entity e) {
+    mice.forEach((Mouse mouse) {
       bool dead = false;
-      if (e is Mouse) {
-        for (Cat cat in cats) {
-          if (_colliding(e, cat)) {
-            dead = true;
+      for (Cat cat in cats) {
+        if (_colliding(mouse, cat)) {
+          dead = true;
 
-            if (onMouseEaten != null) {
-              onMouseEaten(e, cat);
-            }
-
-            break;
+          if (onMouseEaten != null) {
+            onMouseEaten(mouse, cat);
           }
+
+          break;
         }
       }
 
       if (!dead) {
-        newEntities.add(e);
+        newMice.add(mouse);
       }
     });
 
-    entities = newEntities;
+    mice = newMice;
   }
 
   void _tickTiles() {
@@ -145,7 +177,11 @@ class Game {
         Entity e = _generate(generator.direction, x, y);
 
         if (e != null) {
-          entities.add(e);
+          if (e is Cat) {
+            cats.add(e);
+          } else {
+            mice.add(e);
+          }
         }
         return tile;
         break;
@@ -160,7 +196,7 @@ class Game {
   }
 
   Entity _generate(Direction direction, int x, int y) {
-    if (entities.length >= 150) {
+    if (mice.length + cats.length >= 108) {
       return null;
     }
 
@@ -168,15 +204,14 @@ class Game {
 
     switch (generatorPolicy) {
       case GeneratorPolicy.Regular:
-        if (_rng.nextInt(1000) < 20) {
-          if (livingCats <= 0) {
-            livingCats++;
+        if (nextXorShiftInt(_xorShiftState, 1000) < 20) {
+          if (cats.isEmpty) {
             return Cat(position: position);
           }
 
-          if (_rng.nextInt(1000) >= 20) {
+          if (nextXorShiftInt(_xorShiftState, 1000) >= 20) {
             return Mouse(position: position);
-          } else if (_rng.nextInt(1000) >= 10) {
+          } else if (nextXorShiftInt(_xorShiftState, 1000) >= 10) {
             return GoldenMouse(position: position);
           } else {
             return SpecialMouse(position: position);
@@ -185,8 +220,8 @@ class Game {
         break;
 
       case GeneratorPolicy.MouseMania:
-        if (_rng.nextInt(100) < 5) {
-          if (_rng.nextInt(100) < 1) {
+        if (nextXorShiftInt(_xorShiftState, 100) < 5) {
+          if (nextXorShiftInt(_xorShiftState, 100) < 1) {
             return GoldenMouse(position: position);
           } else {
             return Mouse(position: position);
@@ -195,18 +230,16 @@ class Game {
         break;
 
       case GeneratorPolicy.CatMania:
-        if (_rng.nextInt(100) < 2) {
-          if (livingCats < 4) {
-            livingCats++;
+        if (nextXorShiftInt(_xorShiftState, 100) < 2) {
+          if (cats.length < 4) {
             return Cat(position: position);
           }
         }
         break;
 
       case GeneratorPolicy.Challenge:
-        if (_rng.nextInt(100) < 2) {
-          if (livingCats <= 0) {
-            livingCats++;
+        if (nextXorShiftInt(_xorShiftState, 100) < 2) {
+          if (cats.isEmpty) {
             return Cat(position: position);
           }
 
@@ -222,6 +255,14 @@ class Game {
   }
 
   Entity _applyTileEffect(Entity e, List<BoardPosition> pendingArrowDeletions) {
+    // Warp tile
+    if (e.position.y < 0 ||
+        e.position.y == Board.height ||
+        e.position.x < 0 ||
+        e.position.x == Board.width) {
+      return e;
+    }
+
     Tile tile = board.tiles[e.position.x][e.position.y];
 
     switch (tile.runtimeType) {
@@ -233,6 +274,7 @@ class Game {
         break;
 
       case Rocket:
+        if (e.position.step != BoardPosition.centerStep) return e;
         Rocket rocket = tile as Rocket;
 
         if (!rocket.departed) {
@@ -259,7 +301,7 @@ class Game {
       case Arrow:
         Arrow arrow = tile as Arrow;
 
-        if (e.position.step == BoardPosition.maxStep ~/ 2) {
+        if (e.position.step == BoardPosition.centerStep) {
           // Head-on collision with cat
           if (e is Cat &&
               (e.position.direction.index + 2) % 4 == arrow.direction.index) {
@@ -294,21 +336,32 @@ class Game {
   }
 
   void _moveEntities() {
-    Queue<Entity> newEntities = Queue();
+    Queue<Mouse> newMice = Queue();
     List<BoardPosition> pendingArrowDeletions = List();
 
-    entities.forEach((Entity e) {
+    mice.forEach((Mouse e) {
       Entity ne = _applyTileEffect(e, pendingArrowDeletions);
 
       if (ne != null) {
         ne.position = _moveTick(ne.position, ne.moveSpeed());
-        newEntities.add(ne);
-      } else if (e is Cat) {
-        livingCats--;
+        newMice.add(ne);
       }
     });
 
-    entities = newEntities;
+    mice = newMice;
+
+    Queue<Cat> newCats = Queue();
+
+    cats.forEach((Cat e) {
+      Entity ne = _applyTileEffect(e, pendingArrowDeletions);
+
+      if (ne != null) {
+        ne.position = _moveTick(ne.position, ne.moveSpeed());
+        newCats.add(ne);
+      }
+    });
+
+    cats = newCats;
 
     pendingArrowDeletions.forEach((BoardPosition p) {
       board.tiles[p.x][p.y] = Empty();
@@ -322,7 +375,7 @@ class Game {
     int step = e.step;
     bool trapped = false;
 
-    if (e.step == BoardPosition.maxStep / 2) {
+    if (e.step == BoardPosition.centerStep) {
       Direction left = Direction.values[(front.index + 1) % 4];
       Direction back = Direction.values[(front.index + 2) % 4];
       Direction right = Direction.values[(front.index + 3) % 4];
@@ -344,38 +397,37 @@ class Game {
       }
     }
 
+    // If the entity is trapped it shall not move
     if (!trapped) {
-      // If the entity is trapped it shall not move
-
-      step = step + moveSpeed; // FIXME
+      step += moveSpeed;
 
       if (step == BoardPosition.maxStep) {
         switch (front) {
           case Direction.Right:
             x++;
             if (x == Board.width) {
-              x = 0;
+              x = -1;
             }
             break;
 
           case Direction.Up:
             y--;
             if (y == -1) {
-              y = Board.height - 1;
+              y = Board.height;
             }
             break;
 
           case Direction.Left:
             x--;
             if (x == -1) {
-              x = Board.width - 1;
+              x = Board.width;
             }
             break;
 
           case Direction.Down:
             y++;
             if (y == Board.height) {
-              y = 0;
+              y = -1;
             }
             break;
 

@@ -89,18 +89,14 @@ class MultiplayerGameTicker extends GameTicker {
 
     switch (event) {
       case GameEvent.CatMania:
-        game.entities.clear();
+        game.mice.clear();
+        game.cats.clear();
         game.generatorPolicy = GeneratorPolicy.CatMania;
-        game.livingCats = 0;
         break;
 
       case GameEvent.MouseMania:
         game.generatorPolicy = GeneratorPolicy.MouseMania;
-        game.entities.removeWhere((Entity e) {
-          return e is Cat;
-        });
-
-        game.livingCats = 0;
+        game.cats.clear();
         break;
 
       case GameEvent.SpeedUp:
@@ -122,7 +118,7 @@ class MultiplayerGameTicker extends GameTicker {
               Rocket r = game.board.tiles[i][j] as Rocket;
 
               if (r.player != _eventOrigin) {
-                game.entities.add(Cat(
+                game.cats.add(Cat(
                     position: BoardPosition.centered(i, j, Direction.Down)));
               }
             }
@@ -164,9 +160,9 @@ class MultiplayerGameTicker extends GameTicker {
         break;
 
       case GameEvent.CatMania:
-        game.entities.clear();
+        game.cats.clear();
+        game.mice.clear();
         game.generatorPolicy = GeneratorPolicy.Regular;
-        game.livingCats = 0;
         break;
 
       case GameEvent.MouseMania:

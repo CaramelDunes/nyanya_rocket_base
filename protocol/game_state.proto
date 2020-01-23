@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+enum Direction {
+    RIGHT = 0;
+    UP = 1;
+    LEFT = 2;
+    DOWN = 3;
+}
+
+enum PlayerColor {
+    BLUE = 0;
+    YELLOW = 1;
+    RED = 2;
+    GREEN = 3;
+}
+
+enum Wall {
+    NONE = 0;
+    LEFT_ONLY = 1;
+    UP_ONLY = 2;
+    LEFT_UP = 3;
+}
+
+enum TileType {
+    EMPTY = 0;
+    ARROW = 1;
+    PIT = 2;
+    ROCKET = 3;
+    GENERATOR = 4;
+}
+
+enum EntityType {
+    CAT = 0;
+    MOUSE = 1;
+    GOLDEN_MOUSE = 2;
+    SPECIAL_MOUSE = 3;
+}
+
+enum GameEvent {
+    NO_EVENT = 0;
+    MOUSE_MANIA = 1;
+    CAT_MANIA = 2;
+    SPEED_UP = 3;
+    SLOW_DOWN = 4;
+    PLACE_AGAIN = 5;
+    CAT_ATTACK = 6;
+    MOUSE_MONOPOLY = 7;
+}
+
+message Tile {
+    TileType type = 1;
+    Direction direction = 2;
+    PlayerColor owner = 3;
+    bool damagedOrDeparted = 4;
+}
+
+message Board {
+    repeated Wall walls = 1;
+    repeated Tile tiles = 2;
+}
+
+message Entity {
+    EntityType type = 1;
+    uint32 x = 2;
+    uint32 y = 3;
+    uint32 step = 4;
+    Direction direction = 5;
+}
+
+message XorShiftState {
+    uint32 a = 1;
+    uint32 b = 2;
+    uint32 c = 3;
+    uint32 d = 4;
+}
+
+message Game {
+    uint32 timestamp = 1;
+    Board board = 2;
+    repeated Entity cats = 3;
+    repeated Entity mice = 4;
+    repeated uint32 scores = 5;
+    XorShiftState randomState = 6;
+    GameEvent event = 7;
+}

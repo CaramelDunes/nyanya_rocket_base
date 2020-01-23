@@ -1,5 +1,5 @@
 import 'package:nyanya_rocket_base/src/tile.dart';
-import 'package:nyanya_rocket_base/src/protocol/game_server.pb.dart';
+import 'package:nyanya_rocket_base/src/protocol/game_state.pb.dart' as protocol;
 
 enum Direction {
   Right,
@@ -26,8 +26,8 @@ class BoardPosition {
 
   const BoardPosition(this.x, this.y, this.direction, this.step)
       : assert(0 <= step && step <= maxStep),
-        assert(0 <= x && x <= Board.width),
-        assert(0 <= y && y <= Board.height);
+        assert(-1 <= x && x <= Board.width),
+        assert(-1 <= y && y <= Board.height);
 
   const BoardPosition.centered(int x, int y, Direction direction)
       : this(x, y, direction, centerStep);
@@ -49,20 +49,13 @@ class Board {
   static const int width = 12;
   static const int height = 9;
 
-  List<List<Tile>> tiles = List();
-  List<List<Wall>> walls = List();
+  List<List<Tile>> tiles = List.generate(
+      12, (_) => List.generate(9, (_) => Empty(), growable: false),
+      growable: false);
+  List<List<Wall>> walls =
+      List.generate(12, (_) => List.filled(9, Wall.None), growable: false);
 
-  Board() {
-    for (int i = 0; i < width; i++) {
-      tiles.add(List());
-      walls.add(List());
-
-      for (int j = 0; j < height; j++) {
-        tiles.last.add(Empty());
-        walls.last.add(Wall.None);
-      }
-    }
-  }
+  Board();
 
   factory Board.copy(Board b) {
     Board board = Board();
@@ -121,7 +114,7 @@ class Board {
     };
   }
 
-  factory Board.fromPbBoard(ProtocolBoard board) {
+  factory Board.fromPbBoard(protocol.Board board) {
     Board b = Board();
 
     for (int x = 0; x < Board.width; x++) {
@@ -134,13 +127,13 @@ class Board {
     return b;
   }
 
-  ProtocolBoard toPbBoard() {
-    ProtocolBoard b = ProtocolBoard();
+  protocol.Board toPbBoard() {
+    protocol.Board b = protocol.Board();
 
     for (int x = 0; x < Board.width; x++) {
       for (int y = 0; y < Board.height; y++) {
         b.tiles.add(tiles[x][y].toPbTile());
-        b.walls.add(ProtocolWall.values[walls[x][y].index]);
+        b.walls.add(protocol.Wall.values[walls[x][y].index]);
       }
     }
 
@@ -200,6 +193,11 @@ class Board {
   }
 
   bool hasWall(Direction direction, int x, int y) {
+    // Warp tile
+    if (x == -1 || x == Board.width || y == -1 || y == Board.height) {
+      return false;
+    }
+
     switch (direction) {
       case Direction.Right:
         return hasRightWall(x, y);

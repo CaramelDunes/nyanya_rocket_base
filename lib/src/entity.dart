@@ -1,5 +1,5 @@
 import 'package:nyanya_rocket_base/src/board.dart';
-import 'package:nyanya_rocket_base/src/protocol/game_server.pb.dart';
+import 'package:nyanya_rocket_base/src/protocol/game_state.pb.dart' as protocol;
 
 enum EntityType {
   Cat,
@@ -42,56 +42,56 @@ abstract class Entity {
     }
   }
 
-  ProtocolEntity toPbEntity() {
-    ProtocolEntity e = ProtocolEntity()
-      ..direction = ProtocolDirection.values[position.direction.index]
+  protocol.Entity toPbEntity() {
+    protocol.Entity e = protocol.Entity()
+      ..direction = protocol.Direction.values[position.direction.index]
       ..x = position.x
       ..y = position.y
       ..step = position.step;
 
     switch (runtimeType) {
       case Cat:
-        e.type = ProtocolEntityType.CAT;
+        e.type = protocol.EntityType.CAT;
         break;
 
       case SpecialMouse:
-        e.type = ProtocolEntityType.SPECIAL_MOUSE;
+        e.type = protocol.EntityType.SPECIAL_MOUSE;
         break;
 
       case GoldenMouse:
-        e.type = ProtocolEntityType.GOLDEN_MOUSE;
+        e.type = protocol.EntityType.GOLDEN_MOUSE;
         break;
 
       case Mouse:
-        e.type = ProtocolEntityType.MOUSE;
+        e.type = protocol.EntityType.MOUSE;
         break;
     }
 
     return e;
   }
 
-  factory Entity.fromPbEntity(ProtocolEntity entity) {
+  factory Entity.fromPbEntity(protocol.Entity entity) {
     Entity e;
     switch (entity.type) {
-      case ProtocolEntityType.CAT:
+      case protocol.EntityType.CAT:
         e = Cat(
             position: BoardPosition(entity.x, entity.y,
                 Direction.values[entity.direction.value], entity.step));
         break;
 
-      case ProtocolEntityType.MOUSE:
+      case protocol.EntityType.MOUSE:
         e = Mouse(
             position: BoardPosition(entity.x, entity.y,
                 Direction.values[entity.direction.value], entity.step));
         break;
 
-      case ProtocolEntityType.GOLDEN_MOUSE:
+      case protocol.EntityType.GOLDEN_MOUSE:
         e = GoldenMouse(
             position: BoardPosition(entity.x, entity.y,
                 Direction.values[entity.direction.value], entity.step));
         break;
 
-      case ProtocolEntityType.SPECIAL_MOUSE:
+      case protocol.EntityType.SPECIAL_MOUSE:
         e = SpecialMouse(
             position: BoardPosition(entity.x, entity.y,
                 Direction.values[entity.direction.value], entity.step));
