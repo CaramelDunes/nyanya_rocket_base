@@ -36,8 +36,8 @@ enum GeneratorPolicy {
 class Game {
   List<int> _scores = List.filled(4, 0, growable: false);
   Board board = Board();
-  Queue<Cat> cats = Queue();
-  Queue<Mouse> mice = Queue();
+  List<Cat> cats = List();
+  List<Mouse> mice = List();
   GameEvent currentEvent = GameEvent.None;
   GeneratorPolicy generatorPolicy = GeneratorPolicy.Regular;
   XorShiftState _xorShiftState = XorShiftState.random();
@@ -126,7 +126,7 @@ class Game {
   void _tickEntities() {
     _moveEntities();
 
-    Queue<Mouse> newMice = Queue();
+    List<Mouse> newMice = List();
 
     mice.forEach((Mouse mouse) {
       bool dead = false;
@@ -336,7 +336,7 @@ class Game {
   }
 
   void _moveEntities() {
-    Queue<Mouse> newMice = Queue();
+    List<Mouse> newMice = List();
     List<BoardPosition> pendingArrowDeletions = List();
 
     mice.forEach((Mouse e) {
@@ -350,7 +350,7 @@ class Game {
 
     mice = newMice;
 
-    Queue<Cat> newCats = Queue();
+    List<Cat> newCats = List();
 
     cats.forEach((Cat e) {
       Entity ne = _applyTileEffect(e, pendingArrowDeletions);
