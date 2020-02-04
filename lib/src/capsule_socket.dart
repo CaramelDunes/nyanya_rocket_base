@@ -31,7 +31,8 @@ abstract class CapsuleSocket {
   }
 
   @protected
-  void sendCapsule(Capsule capsule, InternetAddress address, int port) {
+  void sendCapsule(Capsule capsule, InternetAddress address, int port,
+      [int copies = 1]) {
     if (_socket == null) {
       print('Caught trying to send a message before socket is ready!');
       return;
@@ -40,7 +41,11 @@ abstract class CapsuleSocket {
     capsule.protocolId = protocolId;
     capsule.sequenceId = _mySequenceNumber;
     Uint8List payload = capsule.writeToBuffer();
-    _socket.send(payload, address, port);
+
+    for (int i = 0; i < copies; i++) {
+      _socket.send(payload, address, port);
+    }
+    
     _mySequenceNumber += 1;
   }
 

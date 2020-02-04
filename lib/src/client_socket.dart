@@ -44,7 +44,7 @@ class ClientSocket extends CapsuleSocket {
       ..y = y
       ..direction = protocol.Direction.values[direction.index];
 
-    sendCapsule(capsule, serverAddress, port);
+    sendCapsule(capsule, serverAddress, port, 5);
   }
 
   @override
