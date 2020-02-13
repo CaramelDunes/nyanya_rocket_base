@@ -15,19 +15,6 @@ class ArrowPosition {
   ArrowPosition(this.x, this.y);
 }
 
-class GameServerParameters {
-  final int port;
-  final List<InternetAddress> expectedClientAddresses;
-  final Duration gameDuration;
-  final Board board;
-
-  GameServerParameters(
-      {this.port = 43210,
-      this.expectedClientAddresses,
-      @required this.gameDuration,
-      @required this.board});
-}
-
 class GameServer extends MultiplayerGameTicker {
   final int nbPlayer;
   int _playerCount = 0;
@@ -35,19 +22,22 @@ class GameServer extends MultiplayerGameTicker {
   ServerSocket _socket;
   bool _forceSendNextTick = false;
 
-  GameServer({
-    @required Board board,
-    @required this.nbPlayer,
-    int port = 43210,
-  }) : super(Game()..board = board) {
+  GameServer(
+      {@required Board board,
+      @required this.nbPlayer,
+      int port = 43210,
+      Set<int> tickets})
+      : super(Game()..board = board) {
     running = false;
     _socket = ServerSocket(
         port: port,
         placeArrowCallback: _onPlaceArrow,
-        playerJoinCallback: _handlePlayerJoin);
+        playerJoinCallback: _handlePlayerJoin,
+        tickets: tickets);
   }
 
   void close() {
+    _socket.close();
     super.close();
   }
 
