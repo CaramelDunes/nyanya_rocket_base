@@ -29,11 +29,11 @@ class ClientSocket extends CapsuleSocket {
 
   @override
   void onSocketReady() {
-    print('Socket is ready');
-    RegisterMessage registerMessage = RegisterMessage()..nickname = nickname;
+    RegisterMessage registerMessage = RegisterMessage()
+      ..nickname = nickname
+      ..ticket = ticket;
     Capsule capsule = Capsule()..register = registerMessage;
 
-    print('sending somwthing');
     sendCapsule(capsule, serverAddress, port);
   }
 
@@ -52,6 +52,7 @@ class ClientSocket extends CapsuleSocket {
     if (!CapsuleSocket.isSequenceNumberGreaterThan(
         capsule.sequenceId, _serverSequenceId)) {
       // Outdated message, skip
+      print('Skipper outdated');
       return;
     }
 
