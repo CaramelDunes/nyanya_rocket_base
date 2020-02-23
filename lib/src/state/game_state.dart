@@ -1,4 +1,6 @@
-import '../../nyanya_rocket_base.dart';
+import '../board.dart';
+import '../entity.dart';
+import '../tile.dart';
 
 class GameState {
   List<int> scores = List.filled(4, 0, growable: false);
