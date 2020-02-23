@@ -1,5 +1,5 @@
-import 'package:nyanya_rocket_base/src/tile.dart';
-import 'package:nyanya_rocket_base/src/protocol/game_state.pb.dart' as protocol;
+import 'tile.dart';
+import 'protocol/game_state.pb.dart' as protocol;
 
 enum Direction {
   Right,
@@ -114,12 +114,12 @@ class Board {
     };
   }
 
-  factory Board.fromPbBoard(protocol.Board board) {
+  factory Board.fromProtocolBoard(protocol.Board board) {
     Board b = Board();
 
     for (int x = 0; x < Board.width; x++) {
       for (int y = 0; y < Board.height; y++) {
-        b.tiles[x][y] = Tile.fromPbTile(board.tiles[x * height + y]);
+        b.tiles[x][y] = Tile.fromProtocolTile(board.tiles[x * height + y]);
         b.walls[x][y] = Wall.values[board.walls[x * height + y].value];
       }
     }
@@ -127,12 +127,12 @@ class Board {
     return b;
   }
 
-  protocol.Board toPbBoard() {
+  protocol.Board toProtocolBoard() {
     protocol.Board b = protocol.Board();
 
     for (int x = 0; x < Board.width; x++) {
       for (int y = 0; y < Board.height; y++) {
-        b.tiles.add(tiles[x][y].toPbTile());
+        b.tiles.add(tiles[x][y].toProtocolTile());
         b.walls.add(protocol.Wall.values[walls[x][y].index]);
       }
     }

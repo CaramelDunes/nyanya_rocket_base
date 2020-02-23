@@ -74,12 +74,12 @@ message XorShiftState {
     uint32 d = 4;
 }
 
-message Game {
-    uint32 timestamp = 1;
+message GameState {
+    uint32 tickCount = 1;
     Board board = 2;
     repeated Entity cats = 3;
     repeated Entity mice = 4;
     repeated uint32 scores = 5;
-    XorShiftState randomState = 6;
+    XorShiftState rngState = 6;
     GameEvent event = 7;
 }

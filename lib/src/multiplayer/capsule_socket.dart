@@ -3,10 +3,11 @@ import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 
-import 'protocol/messages.pb.dart';
+import '../protocol/messages.pb.dart';
 
 abstract class CapsuleSocket {
   static const int protocolId = 0x1ba51999;
+  static const int redundancyCount = 5;
 
   int _mySequenceNumber = 0;
   RawDatagramSocket _socket;
@@ -16,6 +17,7 @@ abstract class CapsuleSocket {
         .then((RawDatagramSocket socket) {
       _socket = socket;
       _socket.listen(_handleSocketEvent);
+
       onSocketReady();
       print('Listening on port $port');
     });
@@ -31,21 +33,22 @@ abstract class CapsuleSocket {
   }
 
   @protected
-  void sendCapsule(Capsule capsule, InternetAddress address, int port,
-      [int copies = 1]) {
+  void sendCapsule(
+      Capsule capsule, InternetAddress address, int port, bool sendCopies) {
     if (_socket == null) {
       print('Caught trying to send a message before socket is ready!');
       return;
     }
 
     capsule.protocolId = protocolId;
-    capsule.sequenceId = _mySequenceNumber;
+    capsule.sequenceNumber = _mySequenceNumber;
     Uint8List payload = capsule.writeToBuffer();
 
+    int copies = sendCopies ? redundancyCount : 1;
     for (int i = 0; i < copies; i++) {
       _socket.send(payload, address, port);
     }
-    
+
     _mySequenceNumber += 1;
   }
 
@@ -68,7 +71,12 @@ abstract class CapsuleSocket {
         }
 
         Capsule capsule = Capsule.fromBuffer(buffer);
-        handleCapsule(packet.address, packet.port, capsule);
+
+        if (capsule.protocolId == protocolId) {
+          handleCapsule(packet.address, packet.port, capsule);
+        } else {
+          print('Received invalid protocol id!');
+        }
       }
     }
   }

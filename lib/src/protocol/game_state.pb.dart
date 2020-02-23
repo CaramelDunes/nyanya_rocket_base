@@ -235,41 +235,41 @@ class XorShiftState extends $pb.GeneratedMessage {
   void clearD() => clearField(4);
 }
 
-class Game extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo('Game', createEmptyInstance: create)
-    ..a<$core.int>(1, 'timestamp', $pb.PbFieldType.OU3)
+class GameState extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('GameState', createEmptyInstance: create)
+    ..a<$core.int>(1, 'tickCount', $pb.PbFieldType.OU3, protoName: 'tickCount')
     ..aOM<Board>(2, 'board', subBuilder: Board.create)
     ..pc<Entity>(3, 'cats', $pb.PbFieldType.PM, subBuilder: Entity.create)
     ..pc<Entity>(4, 'mice', $pb.PbFieldType.PM, subBuilder: Entity.create)
     ..p<$core.int>(5, 'scores', $pb.PbFieldType.PU3)
-    ..aOM<XorShiftState>(6, 'randomState', protoName: 'randomState', subBuilder: XorShiftState.create)
+    ..aOM<XorShiftState>(6, 'rngState', protoName: 'rngState', subBuilder: XorShiftState.create)
     ..e<GameEvent>(7, 'event', $pb.PbFieldType.OE, defaultOrMaker: GameEvent.NO_EVENT, valueOf: GameEvent.valueOf, enumValues: GameEvent.values)
     ..hasRequiredFields = false
   ;
 
-  Game._() : super();
-  factory Game() => create();
-  factory Game.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory Game.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  Game clone() => Game()..mergeFromMessage(this);
-  Game copyWith(void Function(Game) updates) => super.copyWith((message) => updates(message as Game));
+  GameState._() : super();
+  factory GameState() => create();
+  factory GameState.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GameState.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  GameState clone() => GameState()..mergeFromMessage(this);
+  GameState copyWith(void Function(GameState) updates) => super.copyWith((message) => updates(message as GameState));
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static Game create() => Game._();
-  Game createEmptyInstance() => create();
-  static $pb.PbList<Game> createRepeated() => $pb.PbList<Game>();
+  static GameState create() => GameState._();
+  GameState createEmptyInstance() => create();
+  static $pb.PbList<GameState> createRepeated() => $pb.PbList<GameState>();
   @$core.pragma('dart2js:noInline')
-  static Game getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Game>(create);
-  static Game _defaultInstance;
+  static GameState getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GameState>(create);
+  static GameState _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.int get timestamp => $_getIZ(0);
+  $core.int get tickCount => $_getIZ(0);
   @$pb.TagNumber(1)
-  set timestamp($core.int v) { $_setUnsignedInt32(0, v); }
+  set tickCount($core.int v) { $_setUnsignedInt32(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasTimestamp() => $_has(0);
+  $core.bool hasTickCount() => $_has(0);
   @$pb.TagNumber(1)
-  void clearTimestamp() => clearField(1);
+  void clearTickCount() => clearField(1);
 
   @$pb.TagNumber(2)
   Board get board => $_getN(1);
@@ -292,15 +292,15 @@ class Game extends $pb.GeneratedMessage {
   $core.List<$core.int> get scores => $_getList(4);
 
   @$pb.TagNumber(6)
-  XorShiftState get randomState => $_getN(5);
+  XorShiftState get rngState => $_getN(5);
   @$pb.TagNumber(6)
-  set randomState(XorShiftState v) { setField(6, v); }
+  set rngState(XorShiftState v) { setField(6, v); }
   @$pb.TagNumber(6)
-  $core.bool hasRandomState() => $_has(5);
+  $core.bool hasRngState() => $_has(5);
   @$pb.TagNumber(6)
-  void clearRandomState() => clearField(6);
+  void clearRngState() => clearField(6);
   @$pb.TagNumber(6)
-  XorShiftState ensureRandomState() => $_ensure(5);
+  XorShiftState ensureRngState() => $_ensure(5);
 
   @$pb.TagNumber(7)
   GameEvent get event => $_getN(6);

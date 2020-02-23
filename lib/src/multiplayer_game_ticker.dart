@@ -1,9 +1,15 @@
 import 'dart:math';
 
 import 'package:meta/meta.dart';
-import 'package:nyanya_rocket_base/nyanya_rocket_base.dart';
+import 'board.dart';
+import 'entity.dart';
+import 'game_ticker.dart';
+import 'multiplayer/game_server.dart';
+import 'simulators/multiplayer_game_simulator.dart';
+import 'state/multiplayer_game_state.dart';
+import 'tile.dart';
 
-class MultiplayerGameTicker extends GameTicker {
+class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
   Random _rng = Random();
 
   int _eventTickDuration = 0;
@@ -14,7 +20,8 @@ class MultiplayerGameTicker extends GameTicker {
   final List<List<ArrowPosition>> placedArrows =
       List.generate(4, (_) => List(), growable: false);
 
-  MultiplayerGameTicker(Game game) : super(game);
+  MultiplayerGameTicker(MultiplayerGameState game)
+      : super(game, MultiplayerGameSimulator());
 
   bool placeArrow(int x, int y, PlayerColor player, Direction direction) {
     if (running && game.board.tiles[x][y] is Empty) {
@@ -91,11 +98,9 @@ class MultiplayerGameTicker extends GameTicker {
       case GameEvent.CatMania:
         game.mice.clear();
         game.cats.clear();
-        game.generatorPolicy = GeneratorPolicy.CatMania;
         break;
 
       case GameEvent.MouseMania:
-        game.generatorPolicy = GeneratorPolicy.MouseMania;
         game.cats.clear();
         break;
 
@@ -162,11 +167,9 @@ class MultiplayerGameTicker extends GameTicker {
       case GameEvent.CatMania:
         game.cats.clear();
         game.mice.clear();
-        game.generatorPolicy = GeneratorPolicy.Regular;
         break;
 
       case GameEvent.MouseMania:
-        game.generatorPolicy = GeneratorPolicy.Regular;
         break;
 
       case GameEvent.SpeedUp:

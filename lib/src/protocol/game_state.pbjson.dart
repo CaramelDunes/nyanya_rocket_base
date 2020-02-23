@@ -109,15 +109,15 @@ const XorShiftState$json = const {
   ],
 };
 
-const Game$json = const {
-  '1': 'Game',
+const GameState$json = const {
+  '1': 'GameState',
   '2': const [
-    const {'1': 'timestamp', '3': 1, '4': 1, '5': 13, '10': 'timestamp'},
+    const {'1': 'tickCount', '3': 1, '4': 1, '5': 13, '10': 'tickCount'},
     const {'1': 'board', '3': 2, '4': 1, '5': 11, '6': '.Board', '10': 'board'},
     const {'1': 'cats', '3': 3, '4': 3, '5': 11, '6': '.Entity', '10': 'cats'},
     const {'1': 'mice', '3': 4, '4': 3, '5': 11, '6': '.Entity', '10': 'mice'},
     const {'1': 'scores', '3': 5, '4': 3, '5': 13, '10': 'scores'},
-    const {'1': 'randomState', '3': 6, '4': 1, '5': 11, '6': '.XorShiftState', '10': 'randomState'},
+    const {'1': 'rngState', '3': 6, '4': 1, '5': 11, '6': '.XorShiftState', '10': 'rngState'},
     const {'1': 'event', '3': 7, '4': 1, '5': 14, '6': '.GameEvent', '10': 'event'},
   ],
 };

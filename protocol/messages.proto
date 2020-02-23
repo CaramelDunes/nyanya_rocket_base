@@ -14,17 +14,21 @@ message RegisterMessage {
 
 message RegisterSuccessMessage {
     PlayerColor givenColor = 1;
-    string nickname = 2;
+}
+
+message PlayerNicknamesMessage {
+    repeated string nicknames = 1;
 }
 
 message Capsule {
     uint32 protocolId = 1;
-    uint32 sequenceId = 2;
+    uint32 sequenceNumber = 2;
 
     oneof payload {
-        Game game = 3;
+        GameState gameState = 3;
         PlaceArrowMessage placeArrow = 4;
         RegisterMessage register = 5;
         RegisterSuccessMessage registerSuccess = 6;
+        PlayerNicknamesMessage playerNicknames = 7;
     }
 }

@@ -1,136 +1,36 @@
-import 'dart:collection';
 import 'dart:math';
 
-import 'package:nyanya_rocket_base/src/board.dart';
-import 'package:nyanya_rocket_base/src/entity.dart';
-import 'package:nyanya_rocket_base/src/protocol/game_state.pb.dart' as protocol;
-
-import 'package:nyanya_rocket_base/src/tile.dart';
-import 'package:nyanya_rocket_base/src/xor_shift.dart';
+import '../board.dart';
+import '../entity.dart';
+import '../state/game_state.dart';
+import '../tile.dart';
 
 typedef MouseEatenCallback = void Function(Mouse mouse, Cat cat);
 typedef EntityInPitCallback = void Function(Entity entity, int x, int y);
 typedef EntityInRocketCallback = void Function(Entity entity, int x, int y);
 typedef ArrowExpiredCallback = void Function(Arrow arrow, int x, int y);
 
-enum GameEvent {
-  None,
-  MouseMania,
-  CatMania,
-  SpeedUp,
-  SlowDown,
-  PlaceAgain,
-  CatAttack,
-  MouseMonopoly,
-}
-
-enum GeneratorPolicy {
-  Regular,
-  Challenge,
-  MouseMania,
-  CatMania,
-  MouseMonopoly,
-  None,
-}
-
-class Game {
-  List<int> _scores = List.filled(4, 0, growable: false);
-  Board board = Board();
-  List<Cat> cats = List();
-  List<Mouse> mice = List();
-  GameEvent currentEvent = GameEvent.None;
-  GeneratorPolicy generatorPolicy = GeneratorPolicy.Regular;
-  XorShiftState _xorShiftState = XorShiftState.random();
-  int _tickCount = 0;
-
+abstract class GameSimulator<StateType extends GameState> {
   MouseEatenCallback onMouseEaten;
   EntityInPitCallback onEntityInPit;
   EntityInRocketCallback onEntityInRocket;
   ArrowExpiredCallback onArrowExpiry;
 
-  Game();
+  void tick(StateType gameState) {
+    _tickEntities(gameState);
+    _tickTiles(gameState);
 
-  Game.fromJson(Map<String, dynamic> parsedJson) {
-    board = Board.fromJson(parsedJson['board']);
-    Queue<Entity> entities = Queue.from(parsedJson['entities']
-        .map<Entity>((dynamic entity) => Entity.fromJson(entity)));
-
-    entities.forEach((Entity e) {
-      if (e is Cat) {
-        cats.add(e);
-      } else {
-        mice.add(e);
-      }
-    });
+    gameState.tickCount++;
   }
 
-  Map<String, dynamic> toJson() => {
-        'board': board.toJson(),
-        'entities': (cats).map((Entity entity) => entity.toJson()).toList() +
-            (mice).map((Entity entity) => entity.toJson()).toList(),
-      };
-
-  Game.fromProtocolGame(protocol.Game gameState) {
-    board = Board.fromPbBoard(gameState.board);
-
-    gameState.cats.forEach((protocol.Entity entity) {
-      cats.add(Entity.fromPbEntity(entity));
-    });
-
-    gameState.mice.forEach((protocol.Entity entity) {
-      mice.add(Entity.fromPbEntity(entity));
-    });
-
-    _scores = gameState.scores;
-
-    currentEvent = GameEvent.values[gameState.event.value];
-    _tickCount = gameState.timestamp;
-    _xorShiftState.a = gameState.randomState.a;
-    _xorShiftState.b = gameState.randomState.b;
-    _xorShiftState.c = gameState.randomState.c;
-    _xorShiftState.d = gameState.randomState.d;
-  }
-
-  protocol.Game toGameState() {
-    protocol.Game g = protocol.Game();
-
-    g.board = board.toPbBoard();
-    _scores.forEach((int score) => g.scores.add(score));
-    cats.forEach((Cat cat) => g.cats.add(cat.toPbEntity()));
-    mice.forEach((Mouse mouse) => g.mice.add(mouse.toPbEntity()));
-
-    g.event = protocol.GameEvent.values[currentEvent.index];
-
-    g.timestamp = _tickCount;
-
-    g.randomState = protocol.XorShiftState();
-    g.randomState.a = _xorShiftState.a;
-    g.randomState.b = _xorShiftState.b;
-    g.randomState.c = _xorShiftState.c;
-    g.randomState.d = _xorShiftState.d;
-
-    return g;
-  }
-
-  int scoreOf(PlayerColor player) => _scores[player.index];
-
-  int get tickCount => _tickCount;
-
-  void tick() {
-    _tickEntities();
-    _tickTiles();
-
-    _tickCount++;
-  }
-
-  void _tickEntities() {
-    _moveEntities();
+  void _tickEntities(StateType gameState) {
+    _moveEntities(gameState);
 
     List<Mouse> newMice = List();
 
-    mice.forEach((Mouse mouse) {
+    gameState.mice.forEach((Mouse mouse) {
       bool dead = false;
-      for (Cat cat in cats) {
+      for (Cat cat in gameState.cats) {
         if (_colliding(mouse, cat)) {
           dead = true;
 
@@ -147,18 +47,19 @@ class Game {
       }
     });
 
-    mice = newMice;
+    gameState.mice = newMice;
   }
 
-  void _tickTiles() {
+  void _tickTiles(StateType gameState) {
     for (int x = 0; x < Board.width; x++) {
       for (int y = 0; y < Board.height; y++) {
-        board.tiles[x][y] = _updateTile(x, y, board.tiles[x][y]);
+        gameState.board.tiles[x][y] =
+            _updateTile(x, y, gameState.board.tiles[x][y], gameState);
       }
     }
   }
 
-  Tile _updateTile(int x, int y, Tile tile) {
+  Tile _updateTile(int x, int y, Tile tile, StateType gameState) {
     switch (tile.runtimeType) {
       case Arrow:
         Arrow arrow = tile as Arrow;
@@ -174,13 +75,13 @@ class Game {
 
       case Generator:
         Generator generator = tile as Generator;
-        Entity e = _generate(generator.direction, x, y);
+        Entity e = generate(generator.direction, x, y, gameState);
 
         if (e != null) {
           if (e is Cat) {
-            cats.add(e);
+            gameState.cats.add(e);
           } else {
-            mice.add(e);
+            gameState.mice.add(e);
           }
         }
         return tile;
@@ -195,66 +96,10 @@ class Game {
     }
   }
 
-  Entity _generate(Direction direction, int x, int y) {
-    if (mice.length + cats.length >= 108) {
-      return null;
-    }
+  Entity generate(Direction direction, int x, int y, StateType gameState);
 
-    BoardPosition position = BoardPosition.centered(x, y, direction);
-
-    switch (generatorPolicy) {
-      case GeneratorPolicy.Regular:
-        if (nextXorShiftInt(_xorShiftState, 1000) < 20) {
-          if (cats.isEmpty) {
-            return Cat(position: position);
-          }
-
-          if (nextXorShiftInt(_xorShiftState, 1000) >= 20) {
-            return Mouse(position: position);
-          } else if (nextXorShiftInt(_xorShiftState, 1000) >= 10) {
-            return GoldenMouse(position: position);
-          } else {
-            return SpecialMouse(position: position);
-          }
-        }
-        break;
-
-      case GeneratorPolicy.MouseMania:
-        if (nextXorShiftInt(_xorShiftState, 100) < 5) {
-          if (nextXorShiftInt(_xorShiftState, 100) < 1) {
-            return GoldenMouse(position: position);
-          } else {
-            return Mouse(position: position);
-          }
-        }
-        break;
-
-      case GeneratorPolicy.CatMania:
-        if (nextXorShiftInt(_xorShiftState, 100) < 2) {
-          if (cats.length < 4) {
-            return Cat(position: position);
-          }
-        }
-        break;
-
-      case GeneratorPolicy.Challenge:
-        if (nextXorShiftInt(_xorShiftState, 100) < 2) {
-          if (cats.isEmpty) {
-            return Cat(position: position);
-          }
-
-          return Mouse(position: position);
-        }
-        break;
-
-      default:
-        break;
-    }
-
-    return null;
-  }
-
-  Entity _applyTileEffect(Entity e, List<BoardPosition> pendingArrowDeletions) {
+  Entity _applyTileEffect(Entity e, List<BoardPosition> pendingArrowDeletions,
+      StateType gameState) {
     assert(e.position.step == BoardPosition.centerStep);
 
     // Warp tile
@@ -265,7 +110,7 @@ class Game {
       return e;
     }
 
-    Tile tile = board.tiles[e.position.x][e.position.y];
+    Tile tile = gameState.board.tiles[e.position.x][e.position.y];
 
     switch (tile.runtimeType) {
       case Pit:
@@ -280,12 +125,13 @@ class Game {
 
         if (!rocket.departed) {
           if (e is Cat) {
-            _scores[rocket.player.index] -= _scores[rocket.player.index] ~/ 3;
+            gameState.scores[rocket.player.index] -=
+                gameState.scores[rocket.player.index] ~/ 3;
           } else if (e is GoldenMouse) {
-            _scores[rocket.player.index] += 50;
+            gameState.scores[rocket.player.index] += 50;
           } else {
             // Special and Regular mice
-            _scores[rocket.player.index]++;
+            gameState.scores[rocket.player.index]++;
           }
 
           if (onEntityInRocket != null) {
@@ -311,14 +157,14 @@ class Game {
               break;
 
             case ArrowHalfTurnPower.OneCat:
-              board.tiles[e.position.x][e.position.y] =
+              gameState.board.tiles[e.position.x][e.position.y] =
                   arrow.withHalfTurnPower(ArrowHalfTurnPower.ZeroCat);
               pendingArrowDeletions.add(BoardPosition.centered(
                   e.position.x, e.position.y, Direction.Right));
               break;
 
             case ArrowHalfTurnPower.TwoCats:
-              board.tiles[e.position.x][e.position.y] =
+              gameState.board.tiles[e.position.x][e.position.y] =
                   arrow.withHalfTurnPower(ArrowHalfTurnPower.OneCat);
               break;
           }
@@ -334,44 +180,44 @@ class Game {
     }
   }
 
-  void _moveEntities() {
+  void _moveEntities(StateType gameState) {
     List<Mouse> newMice = List();
     List<BoardPosition> pendingArrowDeletions = List();
 
-    mice.forEach((Mouse e) {
+    gameState.mice.forEach((Mouse e) {
       if (e.position.step == BoardPosition.centerStep) {
-        e = _applyTileEffect(e, pendingArrowDeletions);
+        e = _applyTileEffect(e, pendingArrowDeletions, gameState);
       }
 
       if (e != null) {
-        e.position = _moveTick(e.position, e.moveSpeed());
+        e.position = _moveTick(e.position, e.moveSpeed(), gameState);
         newMice.add(e);
       }
     });
 
-    mice = newMice;
+    gameState.mice = newMice;
 
     List<Cat> newCats = List();
 
-    cats.forEach((Cat e) {
+    gameState.cats.forEach((Cat e) {
       if (e.position.step == BoardPosition.centerStep) {
-        e = _applyTileEffect(e, pendingArrowDeletions);
+        e = _applyTileEffect(e, pendingArrowDeletions, gameState);
       }
 
       if (e != null) {
-        e.position = _moveTick(e.position, e.moveSpeed());
+        e.position = _moveTick(e.position, e.moveSpeed(), gameState);
         newCats.add(e);
       }
     });
 
-    cats = newCats;
+    gameState.cats = newCats;
 
     pendingArrowDeletions.forEach((BoardPosition p) {
-      board.tiles[p.x][p.y] = Empty();
+      gameState.board.tiles[p.x][p.y] = Empty();
     });
   }
 
-  BoardPosition _moveTick(BoardPosition e, int moveSpeed) {
+  BoardPosition _moveTick(BoardPosition e, int moveSpeed, StateType gameState) {
     int x = e.x;
     int y = e.y;
     Direction front = e.direction;
@@ -383,10 +229,10 @@ class Game {
       Direction back = Direction.values[(front.index + 2) % 4];
       Direction right = Direction.values[(front.index + 3) % 4];
 
-      bool frontWall = board.hasWall(front, e.x, e.y);
-      bool leftWall = board.hasWall(left, e.x, e.y);
-      bool backWall = board.hasWall(back, e.x, e.y);
-      bool rightWall = board.hasWall(right, e.x, e.y);
+      bool frontWall = gameState.board.hasWall(front, e.x, e.y);
+      bool leftWall = gameState.board.hasWall(left, e.x, e.y);
+      bool backWall = gameState.board.hasWall(back, e.x, e.y);
+      bool rightWall = gameState.board.hasWall(right, e.x, e.y);
 
       if (!frontWall) {
       } else if (!rightWall) {
@@ -504,12 +350,6 @@ class Game {
       return true;
     }
 
-    return false;
-  }
-
-  @override
-  bool operator ==(dynamic other) {
-    if (runtimeType != other.runtimeType) return false;
     return false;
   }
 }

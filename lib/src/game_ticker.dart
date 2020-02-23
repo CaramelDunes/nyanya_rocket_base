@@ -1,14 +1,20 @@
 import 'dart:async';
 
 import 'package:meta/meta.dart';
-import 'package:nyanya_rocket_base/nyanya_rocket_base.dart';
+
+import 'board.dart';
+import 'entity.dart';
+import 'simulators/game_simulator.dart';
+import 'state/game_state.dart';
+import 'tile.dart';
 
 enum GameSpeed { Normal, Fast, Slow }
 
-class GameTicker {
+class GameTicker<T extends GameState> {
   static const Duration tickPeriod = Duration(milliseconds: 16);
 
-  Game _game;
+  T _game;
+  final GameSimulator gameSimulator;
 
   Timer _timer;
 
@@ -17,16 +23,16 @@ class GameTicker {
 
   Duration _pauseDuration = Duration.zero;
 
-  GameTicker(this._game) {
+  GameTicker(this._game, this.gameSimulator) {
     _timer = Timer.periodic(tickPeriod, _tick);
 
-    _game.onMouseEaten = onMouseEaten;
-    _game.onEntityInPit = onEntityInPit;
-    _game.onEntityInRocket = onEntityInRocket;
-    _game.onArrowExpiry = onArrowExpiry;
+    gameSimulator.onMouseEaten = onMouseEaten;
+    gameSimulator.onEntityInPit = onEntityInPit;
+    gameSimulator.onEntityInRocket = onEntityInRocket;
+    gameSimulator.onArrowExpiry = onArrowExpiry;
   }
 
-  Game get game => _game;
+  T get game => _game;
 
   void pauseFor(Duration duration) {
     _pauseDuration = duration;
@@ -34,13 +40,8 @@ class GameTicker {
 
   bool get paused => _pauseDuration > Duration.zero;
 
-  set game(Game g) {
+  set gameState(T g) {
     _game = g;
-
-    _game.onMouseEaten = onMouseEaten;
-    _game.onEntityInPit = onEntityInPit;
-    _game.onEntityInRocket = onEntityInRocket;
-    _game.onArrowExpiry = onArrowExpiry;
   }
 
   @protected
@@ -62,13 +63,13 @@ class GameTicker {
 
       switch (speed) {
         case GameSpeed.Normal:
-          _game.tick();
+          gameSimulator.tick(_game);
           break;
 
         case GameSpeed.Fast:
-          _game.tick();
-          _game.tick();
-          _game.tick();
+          gameSimulator.tick(_game);
+          gameSimulator.tick(_game);
+          gameSimulator.tick(_game);
           break;
 
         case GameSpeed.Slow:

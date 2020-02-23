@@ -1,5 +1,5 @@
-import 'package:nyanya_rocket_base/src/board.dart';
-import 'package:nyanya_rocket_base/src/protocol/game_state.pb.dart' as protocol;
+import 'board.dart';
+import 'protocol/game_state.pb.dart' as protocol;
 
 enum EntityType {
   Cat,
@@ -42,7 +42,7 @@ abstract class Entity {
     }
   }
 
-  protocol.Entity toPbEntity() {
+  protocol.Entity toProtocolEntity() {
     protocol.Entity e = protocol.Entity()
       ..direction = protocol.Direction.values[position.direction.index]
       ..x = position.x
@@ -70,7 +70,7 @@ abstract class Entity {
     return e;
   }
 
-  factory Entity.fromPbEntity(protocol.Entity entity) {
+  factory Entity.fromProtocolEntity(protocol.Entity entity) {
     Entity e;
     switch (entity.type) {
       case protocol.EntityType.CAT:

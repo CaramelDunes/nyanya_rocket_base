@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:meta/meta.dart';
-import 'package:nyanya_rocket_base/src/server_socket.dart';
 
-import 'board.dart';
-import 'game.dart';
-import 'multiplayer_game_ticker.dart';
-import 'tile.dart';
+import '../board.dart';
+import '../state/multiplayer_game_state.dart';
+import '../multiplayer_game_ticker.dart';
+import '../tile.dart';
+import 'server_socket.dart';
 
 class ArrowPosition {
   final int x;
@@ -16,19 +16,18 @@ class ArrowPosition {
 }
 
 class GameServer extends MultiplayerGameTicker {
-  final int nbPlayer;
-  int _playerCount = 0;
+  final int playerCount;
+  int _connectedCount = 0;
 
   ServerSocket _socket;
   bool _forceSendNextTick = false;
 
   GameServer(
       {@required Board board,
-      @required this.nbPlayer,
+      @required this.playerCount,
       int port = 43210,
       Set<int> tickets})
-      : super(Game()..board = board) {
-    running = false;
+      : super(MultiplayerGameState()..board = board) {
     _socket = ServerSocket(
         port: port,
         placeArrowCallback: _onPlaceArrow,
@@ -57,7 +56,7 @@ class GameServer extends MultiplayerGameTicker {
   }
 
   void _handlePlayerJoin() {
-    _playerCount++;
-    running = _playerCount >= nbPlayer;
+    _connectedCount++;
+    running = _connectedCount >= playerCount;
   }
 }

@@ -2,6 +2,7 @@ import 'dart:math';
 
 // Based on https://en.wikipedia.org/wiki/Xorshift
 
+// Warning: Not immutable
 class XorShiftState {
   int a;
   int b;
@@ -16,20 +17,20 @@ class XorShiftState {
     c = rng.nextInt(1 << 32);
     d = rng.nextInt(1 << 32);
   }
-}
 
-int nextXorShiftInt(XorShiftState state, int max) {
-  const int maxUint32 = (1 << 32) - 1;
+  int nextInt(int max) {
+    const int maxUint32 = (1 << 32) - 1;
 
-  int t = state.d;
-  final int s = state.a;
-  state.d = state.c;
-  state.c = state.b;
-  state.b = s;
+    int t = d;
+    final int s = a;
+    d = c;
+    c = b;
+    b = s;
 
-  t ^= (t << 11) & maxUint32;
-  t ^= (t >> 8) & maxUint32;
+    t ^= (t << 11) & maxUint32;
+    t ^= (t >> 8) & maxUint32;
 
-  state.a = (t ^ s ^ ((s >> 19) & maxUint32)) & maxUint32;
-  return state.a % max;
+    a = (t ^ s ^ ((s >> 19) & maxUint32)) & maxUint32;
+    return a % max;
+  }
 }

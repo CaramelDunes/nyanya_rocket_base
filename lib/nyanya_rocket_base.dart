@@ -1,9 +1,13 @@
-export 'src/game.dart';
+export 'src/state/game_state.dart';
+export 'src/state/multiplayer_game_state.dart';
 export 'src/board.dart';
 export 'src/entity.dart';
 export 'src/tile.dart';
 export 'src/game_ticker.dart';
-export 'src/game_server.dart';
-export 'src/client_socket.dart';
+export 'src/multiplayer/game_server.dart';
+export 'src/multiplayer/client_socket.dart';
 export 'src/multiplayer_game_ticker.dart';
-export 'src/protocol/messages.pb.dart';
+export 'src/simulators/puzzle_game_simulator.dart';
+export 'src/simulators/challenge_game_simulator.dart';
+export 'src/simulators/game_simulator.dart';
+export 'src/simulators/multiplayer_game_simulator.dart';

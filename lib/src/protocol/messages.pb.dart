@@ -108,7 +108,6 @@ class RegisterMessage extends $pb.GeneratedMessage {
 class RegisterSuccessMessage extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('RegisterSuccessMessage', createEmptyInstance: create)
     ..e<$0.PlayerColor>(1, 'givenColor', $pb.PbFieldType.OE, protoName: 'givenColor', defaultOrMaker: $0.PlayerColor.BLUE, valueOf: $0.PlayerColor.valueOf, enumValues: $0.PlayerColor.values)
-    ..aOS(2, 'nickname')
     ..hasRequiredFields = false
   ;
 
@@ -135,41 +134,60 @@ class RegisterSuccessMessage extends $pb.GeneratedMessage {
   $core.bool hasGivenColor() => $_has(0);
   @$pb.TagNumber(1)
   void clearGivenColor() => clearField(1);
+}
 
-  @$pb.TagNumber(2)
-  $core.String get nickname => $_getSZ(1);
-  @$pb.TagNumber(2)
-  set nickname($core.String v) { $_setString(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasNickname() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearNickname() => clearField(2);
+class PlayerNicknamesMessage extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('PlayerNicknamesMessage', createEmptyInstance: create)
+    ..pPS(1, 'nicknames')
+    ..hasRequiredFields = false
+  ;
+
+  PlayerNicknamesMessage._() : super();
+  factory PlayerNicknamesMessage() => create();
+  factory PlayerNicknamesMessage.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory PlayerNicknamesMessage.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  PlayerNicknamesMessage clone() => PlayerNicknamesMessage()..mergeFromMessage(this);
+  PlayerNicknamesMessage copyWith(void Function(PlayerNicknamesMessage) updates) => super.copyWith((message) => updates(message as PlayerNicknamesMessage));
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static PlayerNicknamesMessage create() => PlayerNicknamesMessage._();
+  PlayerNicknamesMessage createEmptyInstance() => create();
+  static $pb.PbList<PlayerNicknamesMessage> createRepeated() => $pb.PbList<PlayerNicknamesMessage>();
+  @$core.pragma('dart2js:noInline')
+  static PlayerNicknamesMessage getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PlayerNicknamesMessage>(create);
+  static PlayerNicknamesMessage _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.List<$core.String> get nicknames => $_getList(0);
 }
 
 enum Capsule_Payload {
-  game, 
+  gameState, 
   placeArrow, 
   register, 
   registerSuccess, 
+  playerNicknames, 
   notSet
 }
 
 class Capsule extends $pb.GeneratedMessage {
   static const $core.Map<$core.int, Capsule_Payload> _Capsule_PayloadByTag = {
-    3 : Capsule_Payload.game,
+    3 : Capsule_Payload.gameState,
     4 : Capsule_Payload.placeArrow,
     5 : Capsule_Payload.register,
     6 : Capsule_Payload.registerSuccess,
+    7 : Capsule_Payload.playerNicknames,
     0 : Capsule_Payload.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('Capsule', createEmptyInstance: create)
-    ..oo(0, [3, 4, 5, 6])
+    ..oo(0, [3, 4, 5, 6, 7])
     ..a<$core.int>(1, 'protocolId', $pb.PbFieldType.OU3, protoName: 'protocolId')
-    ..a<$core.int>(2, 'sequenceId', $pb.PbFieldType.OU3, protoName: 'sequenceId')
-    ..aOM<$0.Game>(3, 'game', subBuilder: $0.Game.create)
+    ..a<$core.int>(2, 'sequenceNumber', $pb.PbFieldType.OU3, protoName: 'sequenceNumber')
+    ..aOM<$0.GameState>(3, 'gameState', protoName: 'gameState', subBuilder: $0.GameState.create)
     ..aOM<PlaceArrowMessage>(4, 'placeArrow', protoName: 'placeArrow', subBuilder: PlaceArrowMessage.create)
     ..aOM<RegisterMessage>(5, 'register', subBuilder: RegisterMessage.create)
     ..aOM<RegisterSuccessMessage>(6, 'registerSuccess', protoName: 'registerSuccess', subBuilder: RegisterSuccessMessage.create)
+    ..aOM<PlayerNicknamesMessage>(7, 'playerNicknames', protoName: 'playerNicknames', subBuilder: PlayerNicknamesMessage.create)
     ..hasRequiredFields = false
   ;
 
@@ -201,24 +219,24 @@ class Capsule extends $pb.GeneratedMessage {
   void clearProtocolId() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.int get sequenceId => $_getIZ(1);
+  $core.int get sequenceNumber => $_getIZ(1);
   @$pb.TagNumber(2)
-  set sequenceId($core.int v) { $_setUnsignedInt32(1, v); }
+  set sequenceNumber($core.int v) { $_setUnsignedInt32(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasSequenceId() => $_has(1);
+  $core.bool hasSequenceNumber() => $_has(1);
   @$pb.TagNumber(2)
-  void clearSequenceId() => clearField(2);
+  void clearSequenceNumber() => clearField(2);
 
   @$pb.TagNumber(3)
-  $0.Game get game => $_getN(2);
+  $0.GameState get gameState => $_getN(2);
   @$pb.TagNumber(3)
-  set game($0.Game v) { setField(3, v); }
+  set gameState($0.GameState v) { setField(3, v); }
   @$pb.TagNumber(3)
-  $core.bool hasGame() => $_has(2);
+  $core.bool hasGameState() => $_has(2);
   @$pb.TagNumber(3)
-  void clearGame() => clearField(3);
+  void clearGameState() => clearField(3);
   @$pb.TagNumber(3)
-  $0.Game ensureGame() => $_ensure(2);
+  $0.GameState ensureGameState() => $_ensure(2);
 
   @$pb.TagNumber(4)
   PlaceArrowMessage get placeArrow => $_getN(3);
@@ -252,5 +270,16 @@ class Capsule extends $pb.GeneratedMessage {
   void clearRegisterSuccess() => clearField(6);
   @$pb.TagNumber(6)
   RegisterSuccessMessage ensureRegisterSuccess() => $_ensure(5);
+
+  @$pb.TagNumber(7)
+  PlayerNicknamesMessage get playerNicknames => $_getN(6);
+  @$pb.TagNumber(7)
+  set playerNicknames(PlayerNicknamesMessage v) { setField(7, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasPlayerNicknames() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearPlayerNicknames() => clearField(7);
+  @$pb.TagNumber(7)
+  PlayerNicknamesMessage ensurePlayerNicknames() => $_ensure(6);
 }
 
