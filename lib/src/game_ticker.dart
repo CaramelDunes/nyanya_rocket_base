@@ -59,7 +59,7 @@ class GameTicker<T extends GameState> {
     if (running) {
       beforeTick();
 
-      _game.tick();
+      gameSimulator.tick(_game);
 
       switch (speed) {
         case GameSpeed.Normal:
