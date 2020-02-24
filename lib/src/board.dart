@@ -16,7 +16,7 @@ enum Wall {
 }
 
 class BoardPosition {
-  static const int maxStep = 60;
+  static const int maxStep = 72;
   static const int centerStep = maxStep ~/ 2;
 
   final int x;

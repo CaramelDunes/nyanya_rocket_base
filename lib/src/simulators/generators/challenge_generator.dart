@@ -10,14 +10,14 @@ mixin ChallengeGenerator on GameSimulator<GameState> {
   XorShiftState _rngState = XorShiftState.random();
 
   Entity generate(Direction direction, int x, int y, GameState gameState) {
-    // TODO: Move condition to GameSimulator
-    if (gameState.mice.length + gameState.cats.length >= 108) {
+    // TODO: Maybe move condition to GameSimulator (see MultiplayerGenerator)
+    if (gameState.mice.length >= 100) {
       return null;
     }
 
     BoardPosition position = BoardPosition.centered(x, y, direction);
 
-    if (_rngState.nextInt(100) < 2) {
+    if (_rngState.nextInt(1000) <= 38) {
       if (gameState.cats.isEmpty) {
         return Cat(position: position);
       }

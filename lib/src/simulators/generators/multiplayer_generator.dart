@@ -31,8 +31,8 @@ mixin MultiplayerGenerator on GameSimulator<MultiplayerGameState> {
         break;
 
       case GameEvent.MouseMania:
-        if (gameState.nextXorShiftInt(100) < 5) {
-          if (gameState.nextXorShiftInt(100) < 1) {
+        if (gameState.nextXorShiftInt(1000) < 50) {
+          if (gameState.nextXorShiftInt(1000) < 10) {
             return GoldenMouse(position: position);
           } else {
             return Mouse(position: position);
@@ -41,7 +41,7 @@ mixin MultiplayerGenerator on GameSimulator<MultiplayerGameState> {
         break;
 
       case GameEvent.CatMania:
-        if (gameState.nextXorShiftInt(100) < 2) {
+        if (gameState.nextXorShiftInt(1000) < 20) {
           if (gameState.cats.length < 4) {
             return Cat(position: position);
           }
