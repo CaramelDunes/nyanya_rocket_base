@@ -5,18 +5,41 @@ import '../entity.dart';
 import '../state/game_state.dart';
 import '../tile.dart';
 
+enum GameSpeed { Normal, Fast, Slow }
+
 typedef MouseEatenCallback = void Function(Mouse mouse, Cat cat);
 typedef EntityInPitCallback = void Function(Entity entity, int x, int y);
 typedef EntityInRocketCallback = void Function(Entity entity, int x, int y);
 typedef ArrowExpiredCallback = void Function(Arrow arrow, int x, int y);
 
 abstract class GameSimulator<StateType extends GameState> {
+  GameSpeed speed = GameSpeed.Normal;
+
   MouseEatenCallback onMouseEaten;
   EntityInPitCallback onEntityInPit;
   EntityInRocketCallback onEntityInRocket;
   ArrowExpiredCallback onArrowExpiry;
 
   void tick(StateType gameState) {
+    microTick(gameState);
+
+    switch (speed) {
+      case GameSpeed.Normal:
+        microTick(gameState);
+        break;
+
+      case GameSpeed.Fast:
+        microTick(gameState);
+        microTick(gameState);
+        microTick(gameState);
+        break;
+
+      case GameSpeed.Slow:
+        break;
+    }
+  }
+
+  void microTick(StateType gameState) {
     _tickEntities(gameState);
     _tickTiles(gameState);
 

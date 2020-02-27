@@ -84,11 +84,11 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
 
   @protected
   @mustCallSuper
-  void setGameEvent(GameEvent event) {
-    pauseFor(Duration(seconds: 2)); // Animation duration
-    // TODO Use tick count instead of Duration
+  void installGameEvent(GameEvent event) {
+    game.pauseTicks = GameTicker.durationInTicks(
+        Duration(seconds: 3)); // Animation duration = 3s
 
-    _eventTickDuration = 10 * 60; // 10 seconds
+    _eventTickDuration = GameTicker.durationInTicks(Duration(seconds: 10));
 
     switch (event) {
       case GameEvent.CatMania:
@@ -101,11 +101,11 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
         break;
 
       case GameEvent.SpeedUp:
-        speed = GameSpeed.Fast;
+        _eventTickDuration = GameTicker.durationInTicks(Duration(seconds: 8));
         break;
 
       case GameEvent.SlowDown:
-        speed = GameSpeed.Slow;
+        _eventTickDuration = GameTicker.durationInTicks(Duration(seconds: 8));
         break;
 
       case GameEvent.MouseMonopoly:
@@ -169,11 +169,9 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
         break;
 
       case GameEvent.SpeedUp:
-        speed = GameSpeed.Normal;
         break;
 
       case GameEvent.SlowDown:
-        speed = GameSpeed.Normal;
         break;
 
       case GameEvent.MouseMonopoly:

@@ -8,8 +8,6 @@ import 'simulators/game_simulator.dart';
 import 'state/game_state.dart';
 import 'tile.dart';
 
-enum GameSpeed { Normal, Fast, Slow }
-
 class GameTicker<T extends GameState> {
   static const Duration tickPeriod = Duration(milliseconds: 16);
 
@@ -19,9 +17,6 @@ class GameTicker<T extends GameState> {
   Timer _timer;
 
   bool running = false;
-  GameSpeed speed = GameSpeed.Normal;
-
-  Duration _pauseDuration = Duration.zero;
 
   GameTicker(this._game, this.gameSimulator) {
     _timer = Timer.periodic(tickPeriod, _tick);
@@ -32,13 +27,11 @@ class GameTicker<T extends GameState> {
     gameSimulator.onArrowExpiry = onArrowExpiry;
   }
 
-  T get game => _game;
-
-  void pauseFor(Duration duration) {
-    _pauseDuration = duration;
+  static int durationInTicks(Duration duration) {
+    return (duration.inMilliseconds / tickPeriod.inMilliseconds).floor();
   }
 
-  bool get paused => _pauseDuration > Duration.zero;
+  T get game => _game;
 
   set gameState(T g) {
     _game = g;
@@ -50,31 +43,11 @@ class GameTicker<T extends GameState> {
   @protected
   void afterTick() {}
 
-  void _tick(Timer timer) {
-    if (_pauseDuration > Duration.zero) {
-      _pauseDuration -= tickPeriod;
-      return;
-    }
-
+  void _tick(Timer _) {
     if (running) {
       beforeTick();
 
       gameSimulator.tick(_game);
-
-      switch (speed) {
-        case GameSpeed.Normal:
-          gameSimulator.tick(_game);
-          break;
-
-        case GameSpeed.Fast:
-          gameSimulator.tick(_game);
-          gameSimulator.tick(_game);
-          gameSimulator.tick(_game);
-          break;
-
-        case GameSpeed.Slow:
-          break;
-      }
 
       afterTick();
     }
