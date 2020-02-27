@@ -11,3 +11,4 @@ export 'src/simulators/puzzle_game_simulator.dart';
 export 'src/simulators/challenge_game_simulator.dart';
 export 'src/simulators/game_simulator.dart';
 export 'src/simulators/multiplayer_game_simulator.dart';
+export 'src/exposed_random.dart';

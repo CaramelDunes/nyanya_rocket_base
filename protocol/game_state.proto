@@ -67,19 +67,13 @@ message Entity {
     Direction direction = 5;
 }
 
-message XorShiftState {
-    uint32 a = 1;
-    uint32 b = 2;
-    uint32 c = 3;
-    uint32 d = 4;
-}
-
 message GameState {
     uint32 tickCount = 1;
-    Board board = 2;
-    repeated Entity cats = 3;
-    repeated Entity mice = 4;
-    repeated uint32 scores = 5;
-    XorShiftState rngState = 6;
-    GameEvent event = 7;
+    uint32 pauseTicks = 2;
+    Board board = 3;
+    repeated Entity cats = 4;
+    repeated Entity mice = 5;
+    repeated uint32 scores = 6;
+    uint64 rngState = 7;
+    GameEvent event = 8;
 }

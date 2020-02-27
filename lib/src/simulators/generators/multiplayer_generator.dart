@@ -14,25 +14,9 @@ mixin MultiplayerGenerator on GameSimulator<MultiplayerGameState> {
     BoardPosition position = BoardPosition.centered(x, y, direction);
 
     switch (gameState.currentEvent) {
-      case GameEvent.None:
-        if (gameState.nextXorShiftInt(1000) < 20) {
-          if (gameState.cats.isEmpty) {
-            return Cat(position: position);
-          }
-
-          if (gameState.nextXorShiftInt(1000) >= 20) {
-            return Mouse(position: position);
-          } else if (gameState.nextXorShiftInt(1000) >= 10) {
-            return GoldenMouse(position: position);
-          } else {
-            return SpecialMouse(position: position);
-          }
-        }
-        break;
-
       case GameEvent.MouseMania:
-        if (gameState.nextXorShiftInt(1000) < 50) {
-          if (gameState.nextXorShiftInt(1000) < 10) {
+        if (gameState.rng.nextDouble() <= 0.05) {
+          if (gameState.rng.nextDouble() <= 0.01) {
             return GoldenMouse(position: position);
           } else {
             return Mouse(position: position);
@@ -41,14 +25,32 @@ mixin MultiplayerGenerator on GameSimulator<MultiplayerGameState> {
         break;
 
       case GameEvent.CatMania:
-        if (gameState.nextXorShiftInt(1000) < 20) {
+        if (gameState.rng.nextDouble() <= 0.02) {
           if (gameState.cats.length < 4) {
             return Cat(position: position);
           }
         }
         break;
 
+      case GameEvent.None:
       default:
+        if (gameState.rng.nextDouble() <= 0.015) {
+          if (gameState.cats.isEmpty) {
+            return Cat(position: position);
+          }
+
+          if (gameState.rng.nextDouble() <= 0.01) {
+            if (gameState.mice
+                    .indexWhere((element) => element is SpecialMouse) !=
+                -1) {
+              return GoldenMouse(position: position);
+            } else {
+              return SpecialMouse(position: position);
+            }
+          } else {
+            return Mouse(position: position);
+          }
+        }
         break;
     }
 

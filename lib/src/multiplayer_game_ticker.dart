@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:meta/meta.dart';
 import 'board.dart';
 import 'entity.dart';
@@ -10,8 +8,6 @@ import 'state/multiplayer_game_state.dart';
 import 'tile.dart';
 
 class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
-  Random _rng = Random();
-
   int _eventTickDuration = 0;
 
   GameEvent _scheduledEvent = GameEvent.None;
@@ -62,8 +58,8 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
   @override
   void onEntityInRocket(Entity entity, int x, int y) {
     if (entity is SpecialMouse) {
-      _rng.nextInt(GameEvent.values.length);
-      _scheduledEvent = GameEvent.values[_rng.nextInt(GameEvent.values.length)];
+      _scheduledEvent =
+          GameEvent.values[game.rng.nextInt(GameEvent.values.length - 1) + 1];
       _eventOrigin = (game.board.tiles[x][y] as Rocket).player;
     }
   }

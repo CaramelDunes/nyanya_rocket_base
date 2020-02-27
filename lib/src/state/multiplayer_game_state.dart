@@ -1,6 +1,8 @@
+import 'package:fixnum/fixnum.dart';
+
 import '../board.dart';
 import '../entity.dart';
-import '../xor_shift.dart';
+import '../exposed_random.dart';
 import '../protocol/game_state.pb.dart' as protocol;
 
 import 'game_state.dart';
@@ -18,7 +20,8 @@ enum GameEvent {
 
 class MultiplayerGameState extends GameState {
   GameEvent currentEvent = GameEvent.None;
-  XorShiftState _xorShiftState = XorShiftState.random();
+  ExposedRandom _rng = ExposedRandom();
+  int pauseTicks = 0;
 
   MultiplayerGameState() : super();
 
@@ -37,11 +40,9 @@ class MultiplayerGameState extends GameState {
 
     currentEvent = GameEvent.values[gameState.event.value];
     tickCount = gameState.tickCount;
+    pauseTicks = gameState.pauseTicks;
 
-    _xorShiftState.a = gameState.rngState.a;
-    _xorShiftState.b = gameState.rngState.b;
-    _xorShiftState.c = gameState.rngState.c;
-    _xorShiftState.d = gameState.rngState.d;
+    _rng = ExposedRandom.withState(gameState.rngState.toInt());
   }
 
   protocol.GameState toProtocolGameState() {
@@ -55,17 +56,12 @@ class MultiplayerGameState extends GameState {
     g.event = protocol.GameEvent.values[currentEvent.index];
 
     g.tickCount = tickCount;
+    g.pauseTicks = pauseTicks;
 
-    g.rngState = protocol.XorShiftState();
-    g.rngState.a = _xorShiftState.a;
-    g.rngState.b = _xorShiftState.b;
-    g.rngState.c = _xorShiftState.c;
-    g.rngState.d = _xorShiftState.d;
+    g.rngState = Int64.fromInts(_rng.state >> 32, _rng.state);
 
     return g;
   }
 
-  int nextXorShiftInt(int max) {
-    return _xorShiftState.nextInt(max);
-  }
+  ExposedRandom get rng => _rng;
 }

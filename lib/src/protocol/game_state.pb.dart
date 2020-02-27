@@ -7,6 +7,7 @@
 
 import 'dart:core' as $core;
 
+import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 import 'game_state.pbenum.dart';
@@ -174,76 +175,16 @@ class Entity extends $pb.GeneratedMessage {
   void clearDirection() => clearField(5);
 }
 
-class XorShiftState extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo('XorShiftState', createEmptyInstance: create)
-    ..a<$core.int>(1, 'a', $pb.PbFieldType.OU3)
-    ..a<$core.int>(2, 'b', $pb.PbFieldType.OU3)
-    ..a<$core.int>(3, 'c', $pb.PbFieldType.OU3)
-    ..a<$core.int>(4, 'd', $pb.PbFieldType.OU3)
-    ..hasRequiredFields = false
-  ;
-
-  XorShiftState._() : super();
-  factory XorShiftState() => create();
-  factory XorShiftState.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory XorShiftState.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  XorShiftState clone() => XorShiftState()..mergeFromMessage(this);
-  XorShiftState copyWith(void Function(XorShiftState) updates) => super.copyWith((message) => updates(message as XorShiftState));
-  $pb.BuilderInfo get info_ => _i;
-  @$core.pragma('dart2js:noInline')
-  static XorShiftState create() => XorShiftState._();
-  XorShiftState createEmptyInstance() => create();
-  static $pb.PbList<XorShiftState> createRepeated() => $pb.PbList<XorShiftState>();
-  @$core.pragma('dart2js:noInline')
-  static XorShiftState getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<XorShiftState>(create);
-  static XorShiftState _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.int get a => $_getIZ(0);
-  @$pb.TagNumber(1)
-  set a($core.int v) { $_setUnsignedInt32(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasA() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearA() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.int get b => $_getIZ(1);
-  @$pb.TagNumber(2)
-  set b($core.int v) { $_setUnsignedInt32(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasB() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearB() => clearField(2);
-
-  @$pb.TagNumber(3)
-  $core.int get c => $_getIZ(2);
-  @$pb.TagNumber(3)
-  set c($core.int v) { $_setUnsignedInt32(2, v); }
-  @$pb.TagNumber(3)
-  $core.bool hasC() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearC() => clearField(3);
-
-  @$pb.TagNumber(4)
-  $core.int get d => $_getIZ(3);
-  @$pb.TagNumber(4)
-  set d($core.int v) { $_setUnsignedInt32(3, v); }
-  @$pb.TagNumber(4)
-  $core.bool hasD() => $_has(3);
-  @$pb.TagNumber(4)
-  void clearD() => clearField(4);
-}
-
 class GameState extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('GameState', createEmptyInstance: create)
     ..a<$core.int>(1, 'tickCount', $pb.PbFieldType.OU3, protoName: 'tickCount')
-    ..aOM<Board>(2, 'board', subBuilder: Board.create)
-    ..pc<Entity>(3, 'cats', $pb.PbFieldType.PM, subBuilder: Entity.create)
-    ..pc<Entity>(4, 'mice', $pb.PbFieldType.PM, subBuilder: Entity.create)
-    ..p<$core.int>(5, 'scores', $pb.PbFieldType.PU3)
-    ..aOM<XorShiftState>(6, 'rngState', protoName: 'rngState', subBuilder: XorShiftState.create)
-    ..e<GameEvent>(7, 'event', $pb.PbFieldType.OE, defaultOrMaker: GameEvent.NO_EVENT, valueOf: GameEvent.valueOf, enumValues: GameEvent.values)
+    ..a<$core.int>(2, 'pauseTicks', $pb.PbFieldType.OU3, protoName: 'pauseTicks')
+    ..aOM<Board>(3, 'board', subBuilder: Board.create)
+    ..pc<Entity>(4, 'cats', $pb.PbFieldType.PM, subBuilder: Entity.create)
+    ..pc<Entity>(5, 'mice', $pb.PbFieldType.PM, subBuilder: Entity.create)
+    ..p<$core.int>(6, 'scores', $pb.PbFieldType.PU3)
+    ..a<$fixnum.Int64>(7, 'rngState', $pb.PbFieldType.OU6, protoName: 'rngState', defaultOrMaker: $fixnum.Int64.ZERO)
+    ..e<GameEvent>(8, 'event', $pb.PbFieldType.OE, defaultOrMaker: GameEvent.NO_EVENT, valueOf: GameEvent.valueOf, enumValues: GameEvent.values)
     ..hasRequiredFields = false
   ;
 
@@ -272,43 +213,50 @@ class GameState extends $pb.GeneratedMessage {
   void clearTickCount() => clearField(1);
 
   @$pb.TagNumber(2)
-  Board get board => $_getN(1);
+  $core.int get pauseTicks => $_getIZ(1);
   @$pb.TagNumber(2)
-  set board(Board v) { setField(2, v); }
+  set pauseTicks($core.int v) { $_setUnsignedInt32(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasBoard() => $_has(1);
+  $core.bool hasPauseTicks() => $_has(1);
   @$pb.TagNumber(2)
-  void clearBoard() => clearField(2);
-  @$pb.TagNumber(2)
-  Board ensureBoard() => $_ensure(1);
+  void clearPauseTicks() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.List<Entity> get cats => $_getList(2);
+  Board get board => $_getN(2);
+  @$pb.TagNumber(3)
+  set board(Board v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasBoard() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearBoard() => clearField(3);
+  @$pb.TagNumber(3)
+  Board ensureBoard() => $_ensure(2);
 
   @$pb.TagNumber(4)
-  $core.List<Entity> get mice => $_getList(3);
+  $core.List<Entity> get cats => $_getList(3);
 
   @$pb.TagNumber(5)
-  $core.List<$core.int> get scores => $_getList(4);
+  $core.List<Entity> get mice => $_getList(4);
 
   @$pb.TagNumber(6)
-  XorShiftState get rngState => $_getN(5);
-  @$pb.TagNumber(6)
-  set rngState(XorShiftState v) { setField(6, v); }
-  @$pb.TagNumber(6)
-  $core.bool hasRngState() => $_has(5);
-  @$pb.TagNumber(6)
-  void clearRngState() => clearField(6);
-  @$pb.TagNumber(6)
-  XorShiftState ensureRngState() => $_ensure(5);
+  $core.List<$core.int> get scores => $_getList(5);
 
   @$pb.TagNumber(7)
-  GameEvent get event => $_getN(6);
+  $fixnum.Int64 get rngState => $_getI64(6);
   @$pb.TagNumber(7)
-  set event(GameEvent v) { setField(7, v); }
+  set rngState($fixnum.Int64 v) { $_setInt64(6, v); }
   @$pb.TagNumber(7)
-  $core.bool hasEvent() => $_has(6);
+  $core.bool hasRngState() => $_has(6);
   @$pb.TagNumber(7)
-  void clearEvent() => clearField(7);
+  void clearRngState() => clearField(7);
+
+  @$pb.TagNumber(8)
+  GameEvent get event => $_getN(7);
+  @$pb.TagNumber(8)
+  set event(GameEvent v) { setField(8, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasEvent() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearEvent() => clearField(8);
 }
 
