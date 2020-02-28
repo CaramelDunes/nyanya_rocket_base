@@ -43,10 +43,10 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
     if (running && game.board.tiles[x][y] is Empty) {
       int count = 0;
       ArrowPosition last;
-      int lastExpiration = Arrow.defaultExpiration;
+      int lastExpiration = 1 << 32;
 
+      // TODO Get rid of that ugly thing
       for (int i = 0; i < Board.width; i++) {
-        // TODO Get rid of that ugly thing
         for (int j = 0; j < Board.height; j++) {
           if (game.board.tiles[i][j] is Arrow) {
             Arrow arrow = game.board.tiles[i][j] as Arrow;
