@@ -52,11 +52,18 @@ class GameServer extends MultiplayerGameTicker {
 
   void _onPlaceArrow(
       int x, int y, Direction direction, PlayerColor playerColor) {
-    _forceSendNextTick = placeArrow(x, y, playerColor, direction);
+    _forceSendNextTick |= placeArrow(x, y, playerColor, direction);
   }
 
   void _handlePlayerJoin() {
     _connectedCount++;
     running = _connectedCount >= playerCount;
+  }
+
+  @override
+  void installGameEvent(GameEvent event) {
+    super.installGameEvent(event);
+
+    _forceSendNextTick = true;
   }
 }
