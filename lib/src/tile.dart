@@ -71,6 +71,10 @@ abstract class Tile {
         t = Empty();
         break;
 
+      case protocol.TileType.PIT:
+        t = const Pit();
+        break;
+
       case protocol.TileType.ROCKET:
         t = Rocket(player: PlayerColor.values[tile.owner.value]);
         break;
@@ -81,11 +85,16 @@ abstract class Tile {
             direction: Direction.values[tile.direction.value],
             halfTurnPower: tile.damagedOrDeparted
                 ? ArrowHalfTurnPower.OneCat
-                : ArrowHalfTurnPower.TwoCats);
+                : ArrowHalfTurnPower.TwoCats,
+            expiration: tile.expiration);
         break;
 
       case protocol.TileType.GENERATOR:
         t = Generator(direction: Direction.values[tile.direction.value]);
+        break;
+
+      default:
+        print('Got unknown tile type from network!');
         break;
     }
 
@@ -98,6 +107,8 @@ abstract class Tile {
 }
 
 class Empty extends Tile {
+  const Empty();
+
   @override
   Map<String, dynamic> toJson() {
     return {
@@ -108,6 +119,11 @@ class Empty extends Tile {
   @override
   protocol.Tile toProtocolTile() =>
       protocol.Tile()..type = protocol.TileType.EMPTY;
+
+  @override
+  bool operator ==(other) {
+    return other is Empty;
+  }
 }
 
 enum ArrowHalfTurnPower { TwoCats, OneCat, ZeroCat }
@@ -127,7 +143,7 @@ class Arrow extends Tile {
       this.halfTurnPower = ArrowHalfTurnPower.TwoCats,
       this.expiration = defaultExpiration});
 
-  const Arrow.notExpirable({
+  const Arrow.notExpiring({
     @required this.player,
     @required this.direction,
     this.halfTurnPower = ArrowHalfTurnPower.TwoCats,
@@ -165,10 +181,23 @@ class Arrow extends Tile {
     ..type = protocol.TileType.ARROW
     ..owner = protocol.PlayerColor.values[player.index]
     ..direction = protocol.Direction.values[direction.index]
-    ..damagedOrDeparted = halfTurnPower == ArrowHalfTurnPower.OneCat;
+    ..damagedOrDeparted = halfTurnPower == ArrowHalfTurnPower.OneCat
+    ..expiration = expiration;
+
+  @override
+  bool operator ==(other) {
+    return super == other ||
+        (other is Arrow &&
+            player == other.player &&
+            direction == other.direction &&
+            halfTurnPower == other.halfTurnPower &&
+            expiration == other.expiration);
+  }
 }
 
 class Pit extends Tile {
+  const Pit();
+
   @override
   Map<String, dynamic> toJson() {
     return {
@@ -178,6 +207,11 @@ class Pit extends Tile {
 
   protocol.Tile toProtocolTile() =>
       protocol.Tile()..type = protocol.TileType.PIT;
+
+  @override
+  bool operator ==(other) {
+    return other is Pit;
+  }
 }
 
 class Rocket extends Tile {
@@ -202,6 +236,14 @@ class Rocket extends Tile {
   protocol.Tile toProtocolTile() => protocol.Tile()
     ..type = protocol.TileType.ROCKET
     ..owner = protocol.PlayerColor.values[player.index];
+
+  @override
+  bool operator ==(other) {
+    return super == other ||
+        (other is Rocket &&
+            player == other.player &&
+            departed == other.departed);
+  }
 }
 
 class Generator extends Tile {
@@ -222,4 +264,10 @@ class Generator extends Tile {
   protocol.Tile toProtocolTile() => protocol.Tile()
     ..type = protocol.TileType.GENERATOR
     ..direction = protocol.Direction.values[direction.index];
+
+  @override
+  bool operator ==(other) {
+    return super == other ||
+        (other is Generator && direction == other.direction);
+  }
 }

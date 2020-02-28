@@ -243,4 +243,20 @@ class Board {
         break;
     }
   }
+
+  @override
+  bool operator ==(other) {
+    if (super == other) return true;
+
+    if (runtimeType != other.runtimeType) return false;
+
+    for (int i = 0; i < width; i++) {
+      for (int j = 0; j < height; j++) {
+        if (walls[i][j] != other.walls[i][j]) return false;
+        if (tiles[i][j] != other.tiles[i][j]) return false;
+      }
+    }
+
+    return true;
+  }
 }
