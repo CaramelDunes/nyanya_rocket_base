@@ -16,6 +16,7 @@ enum GameEvent {
   PlaceAgain,
   CatAttack,
   MouseMonopoly,
+  EverybodyMove
 }
 
 class MultiplayerGameState extends GameState {

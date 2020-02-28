@@ -67,6 +67,7 @@ const GameEvent$json = const {
     const {'1': 'PLACE_AGAIN', '2': 5},
     const {'1': 'CAT_ATTACK', '2': 6},
     const {'1': 'MOUSE_MONOPOLY', '2': 7},
+    const {'1': 'EVERYBODY_MOVE', '2': 8},
   ],
 };
 
@@ -77,6 +78,7 @@ const Tile$json = const {
     const {'1': 'direction', '3': 2, '4': 1, '5': 14, '6': '.Direction', '10': 'direction'},
     const {'1': 'owner', '3': 3, '4': 1, '5': 14, '6': '.PlayerColor', '10': 'owner'},
     const {'1': 'damagedOrDeparted', '3': 4, '4': 1, '5': 8, '10': 'damagedOrDeparted'},
+    const {'1': 'expiration', '3': 5, '4': 1, '5': 13, '10': 'expiration'},
   ],
 };
 

@@ -20,6 +20,7 @@ class Tile extends $pb.GeneratedMessage {
     ..e<Direction>(2, 'direction', $pb.PbFieldType.OE, defaultOrMaker: Direction.RIGHT, valueOf: Direction.valueOf, enumValues: Direction.values)
     ..e<PlayerColor>(3, 'owner', $pb.PbFieldType.OE, defaultOrMaker: PlayerColor.BLUE, valueOf: PlayerColor.valueOf, enumValues: PlayerColor.values)
     ..aOB(4, 'damagedOrDeparted', protoName: 'damagedOrDeparted')
+    ..a<$core.int>(5, 'expiration', $pb.PbFieldType.OU3)
     ..hasRequiredFields = false
   ;
 
@@ -73,6 +74,15 @@ class Tile extends $pb.GeneratedMessage {
   $core.bool hasDamagedOrDeparted() => $_has(3);
   @$pb.TagNumber(4)
   void clearDamagedOrDeparted() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.int get expiration => $_getIZ(4);
+  @$pb.TagNumber(5)
+  set expiration($core.int v) { $_setUnsignedInt32(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasExpiration() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearExpiration() => clearField(5);
 }
 
 class Board extends $pb.GeneratedMessage {

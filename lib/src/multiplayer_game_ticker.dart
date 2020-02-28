@@ -7,6 +7,26 @@ import 'simulators/multiplayer_game_simulator.dart';
 import 'state/multiplayer_game_state.dart';
 import 'tile.dart';
 
+// Reference behaviors:
+// Mouse Monopoly: https://youtu.be/eHWSrXzEV1I?t=613
+// Cat Mania: https://youtu.be/eHWSrXzEV1I?t=626
+
+// Everybody Move: https://youtu.be/eHWSrXzEV1I?t=716
+// Blue -> Yellow -> Green -> Red
+// https://youtu.be/eHWSrXzEV1I?t=835
+// Blue -> Green -> Red -> Yellow
+// https://youtu.be/eHWSrXzEV1I?t=1180
+// Blue -> Yellow -> Green -> Red
+// https://youtu.be/eHWSrXzEV1I?t=1234
+// Blue <-> Red, Yellow <-> Green
+// Blue -> Red -> Green -> Yellow
+// Blue -> Red -> Yellow -> Green
+
+// Mouse Mania: https://youtu.be/eHWSrXzEV1I?t=722
+// Speed Up: https://youtu.be/eHWSrXzEV1I?t=735
+// Place Arrows Again: https://youtu.be/eHWSrXzEV1I?t=755
+// Slow Down: https://youtu.be/eHWSrXzEV1I?t=824
+
 class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
   int _eventTickDuration = 0;
 
@@ -70,12 +90,12 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
     if (_eventTickDuration > 1) {
       _eventTickDuration--;
     } else if (_eventTickDuration == 1) {
-      removeGameEvent();
+      uninstallGameEvent();
     }
 
     if (_scheduledEvent != GameEvent.None) {
-      removeGameEvent();
-      setGameEvent(_scheduledEvent);
+      uninstallGameEvent();
+      installGameEvent(_scheduledEvent);
       _scheduledEvent = GameEvent.None;
     }
 
@@ -109,7 +129,18 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
         break;
 
       case GameEvent.MouseMonopoly:
-        _eventTickDuration = 5 * 60; // 5 seconds
+        _eventTickDuration = 1;
+
+        // Cash-in all mice on board
+        game.mice.forEach((mouse) {
+          if (mouse is GoldenMouse) {
+            game.scores[_eventOrigin.index] += 50;
+          } else {
+            game.scores[_eventOrigin.index]++;
+          }
+        });
+
+        game.mice.clear();
         break;
 
       case GameEvent.CatAttack:
@@ -126,10 +157,13 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
           }
         }
 
-        _eventTickDuration = 1; // 10 seconds
+        _eventTickDuration = 1;
         break;
 
       case GameEvent.PlaceAgain:
+        // Players got 3 seconds to place arrows.
+        game.pauseTicks += GameTicker.durationInTicks(Duration(seconds: 3));
+
         // TODO Get rid of that ugly thing
         for (int i = 0; i < Board.width; i++) {
           for (int j = 0; j < Board.height; j++) {
@@ -144,6 +178,41 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
         _eventTickDuration = 1; // 10 seconds
         break;
 
+      case GameEvent.EverybodyMove:
+        // Players got 2 seconds to see where their rocket is.
+        game.pauseTicks += GameTicker.durationInTicks(Duration(seconds: 2));
+
+        List<ArrowPosition> rocketPositions = List.filled(4, null);
+
+        for (int i = 0; i < Board.width; i++) {
+          for (int j = 0; j < Board.height; j++) {
+            if (game.board.tiles[i][j] is Rocket) {
+              rocketPositions[(game.board.tiles[i][j] as Rocket).player.index] =
+                  ArrowPosition(i, j);
+            }
+          }
+        }
+
+        assert(rocketPositions[0] != null &&
+            rocketPositions[1] != null &&
+            rocketPositions[2] != null &&
+            rocketPositions[3] != null);
+
+        var derangement = List.of(rocketPositions);
+
+        while (!_isDerangement(rocketPositions, derangement)) {
+          derangement.shuffle(game.rng);
+        }
+
+        for (int i = 0; i < 4; i++) {
+          ArrowPosition pos = derangement[i];
+          game.board.tiles[pos.x][pos.y] =
+              Rocket(player: PlayerColor.values[i]);
+        }
+
+        _eventTickDuration = 1;
+        break;
+
       case GameEvent.None:
         break;
     }
@@ -153,7 +222,7 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
 
   @protected
   @mustCallSuper
-  void removeGameEvent() {
+  void uninstallGameEvent() {
     _eventTickDuration = 0;
 
     switch (game.currentEvent) {
@@ -180,10 +249,23 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
       case GameEvent.PlaceAgain:
         break;
 
+      case GameEvent.EverybodyMove:
+        break;
+
       case GameEvent.None:
         break;
     }
 
     game.currentEvent = GameEvent.None;
   }
+}
+
+bool _isDerangement(List a, List b) {
+  assert(a.length == b.length);
+
+  for (int i = 0; i < a.length; i++) {
+    if (a[i] == b[i]) return false;
+  }
+
+  return true;
 }

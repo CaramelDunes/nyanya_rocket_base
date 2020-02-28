@@ -45,6 +45,7 @@ enum GameEvent {
     PLACE_AGAIN = 5;
     CAT_ATTACK = 6;
     MOUSE_MONOPOLY = 7;
+    EVERYBODY_MOVE = 8;
 }
 
 message Tile {
@@ -52,6 +53,7 @@ message Tile {
     Direction direction = 2;
     PlayerColor owner = 3;
     bool damagedOrDeparted = 4;
+    uint32 expiration = 5;
 }
 
 message Board {

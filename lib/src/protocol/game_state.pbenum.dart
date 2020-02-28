@@ -115,6 +115,7 @@ class GameEvent extends $pb.ProtobufEnum {
   static const GameEvent PLACE_AGAIN = GameEvent._(5, 'PLACE_AGAIN');
   static const GameEvent CAT_ATTACK = GameEvent._(6, 'CAT_ATTACK');
   static const GameEvent MOUSE_MONOPOLY = GameEvent._(7, 'MOUSE_MONOPOLY');
+  static const GameEvent EVERYBODY_MOVE = GameEvent._(8, 'EVERYBODY_MOVE');
 
   static const $core.List<GameEvent> values = <GameEvent> [
     NO_EVENT,
@@ -125,6 +126,7 @@ class GameEvent extends $pb.ProtobufEnum {
     PLACE_AGAIN,
     CAT_ATTACK,
     MOUSE_MONOPOLY,
+    EVERYBODY_MOVE,
   ];
 
   static final $core.Map<$core.int, GameEvent> _byValue = $pb.ProtobufEnum.initByValue(values);
