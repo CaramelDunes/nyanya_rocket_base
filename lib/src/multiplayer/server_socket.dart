@@ -79,7 +79,7 @@ class ServerSocket extends CapsuleSocket {
     ConnectionInfo playerSequenceNumber =
         _connections.containsKey(key) ? _connections[key] : null;
 
-    if (capsule.hasRegister()) {
+    if (capsule.hasRegister() && playerSequenceNumber == null) {
       if (capsule.sequenceNumber != 0) {
         print('Received non-zero sequence id in a registration packet.');
         return;

@@ -18,7 +18,7 @@ class ClientSocket extends CapsuleSocket {
   final Function(PlayerColor assignedColor) playerRegisterSuccessCallback;
   final Function(List<String> nicknames) playerNicknamesCallback;
 
-  int _serverSequenceNumber = 0;
+  int _serverSequenceNumber = -1;
 
   ClientSocket(
       {@required this.serverAddress,
