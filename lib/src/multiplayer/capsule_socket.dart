@@ -28,8 +28,7 @@ abstract class CapsuleSocket {
   }
 
   static bool isSequenceNumberGreaterThan(int s1, int s2) {
-    return ((s1 > s2) && (s1 - s2 <= 32768)) ||
-        ((s1 < s2) && (s2 - s1 > 32768));
+    return s1 > s2;
   }
 
   @protected

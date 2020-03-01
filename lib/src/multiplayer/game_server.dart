@@ -44,7 +44,7 @@ class GameServer extends MultiplayerGameTicker {
   void afterTick() {
     super.afterTick();
 
-    if (game.tickCount % 15 == 0 || _forceSendNextTick) {
+    if (game.tickCount % 30 == 0 || _forceSendNextTick) {
       _socket.sendGameState(game);
       _forceSendNextTick = false;
     }

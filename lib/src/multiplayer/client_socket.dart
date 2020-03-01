@@ -33,7 +33,7 @@ class ClientSocket extends CapsuleSocket {
   @override
   void onSocketReady() {
     RegisterMessage registerMessage = RegisterMessage()
-      ..nickname = nickname
+      ..nickname = nickname ?? ''
       ..ticket = ticket ?? 0;
     Capsule capsule = Capsule()..register = registerMessage;
 

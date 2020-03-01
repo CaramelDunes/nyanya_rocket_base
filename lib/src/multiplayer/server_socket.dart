@@ -116,8 +116,8 @@ class ServerSocket extends CapsuleSocket {
 
       playerJoinCallback();
     } else if (playerSequenceNumber == null ||
-        CapsuleSocket.isSequenceNumberGreaterThan(
-            playerSequenceNumber.sequenceNumber, capsule.sequenceNumber)) {
+        !CapsuleSocket.isSequenceNumberGreaterThan(
+            capsule.sequenceNumber, playerSequenceNumber.sequenceNumber)) {
       return;
     }
 
