@@ -7,6 +7,9 @@ mixin MultiplayerGenerator on GameSimulator<MultiplayerGameState> {
   @override
   Entity generate(
       Direction direction, int x, int y, MultiplayerGameState gameState) {
+    double firstRandomDouble = gameState.rng.nextDouble();
+    double secondRandomDouble = gameState.rng.nextDouble();
+
     if (gameState.mice.length + gameState.cats.length >= 108) {
       return null;
     }
@@ -15,8 +18,8 @@ mixin MultiplayerGenerator on GameSimulator<MultiplayerGameState> {
 
     switch (gameState.currentEvent) {
       case GameEvent.MouseMania:
-        if (gameState.rng.nextDouble() <= 0.05) {
-          if (gameState.rng.nextDouble() <= 0.01) {
+        if (firstRandomDouble <= 0.05) {
+          if (secondRandomDouble <= 0.01) {
             return GoldenMouse(position: position);
           } else {
             return Mouse(position: position);
@@ -25,7 +28,7 @@ mixin MultiplayerGenerator on GameSimulator<MultiplayerGameState> {
         break;
 
       case GameEvent.CatMania:
-        if (gameState.rng.nextDouble() <= 0.02) {
+        if (firstRandomDouble <= 0.02) {
           if (gameState.cats.length < 4) {
             return Cat(position: position);
           }
@@ -34,12 +37,12 @@ mixin MultiplayerGenerator on GameSimulator<MultiplayerGameState> {
 
       case GameEvent.None:
       default:
-        if (gameState.rng.nextDouble() <= 0.015) {
+        if (firstRandomDouble <= 0.015) {
           if (gameState.cats.isEmpty) {
             return Cat(position: position);
           }
 
-          if (gameState.rng.nextDouble() <= 0.01) {
+          if (secondRandomDouble <= 0.01) {
             if (gameState.mice
                     .indexWhere((element) => element is SpecialMouse) !=
                 -1) {

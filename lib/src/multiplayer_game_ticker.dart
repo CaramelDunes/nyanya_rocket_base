@@ -32,6 +32,7 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
 
   GameEvent _scheduledEvent = GameEvent.None;
   PlayerColor _eventOrigin;
+  GameEvent _nextEvent = GameEvent.None;
 
   final List<List<ArrowPosition>> placedArrows =
       List.generate(4, (_) => List(), growable: false);
@@ -78,8 +79,7 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
   @override
   void onEntityInRocket(Entity entity, int x, int y) {
     if (entity is SpecialMouse) {
-      _scheduledEvent =
-          GameEvent.values[game.rng.nextInt(GameEvent.values.length - 1) + 1];
+      _scheduledEvent = _nextEvent;
       _eventOrigin = (game.board.tiles[x][y] as Rocket).player;
     }
   }
@@ -100,6 +100,8 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
     }
 
     super.afterTick();
+    _nextEvent =
+        GameEvent.values[game.rng.nextInt(GameEvent.values.length - 1) + 1];
   }
 
   @protected
