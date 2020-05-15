@@ -68,8 +68,14 @@ abstract class CapsuleSocket {
           print('Received packet of size 0');
           return;
         }
+        Capsule capsule;
 
-        Capsule capsule = Capsule.fromBuffer(buffer);
+        try {
+          capsule = Capsule.fromBuffer(buffer);
+        } catch (e) {
+          print('[WARN] Received bogus message: $e');
+          return;
+        }
 
         if (capsule.protocolId == protocolId) {
           handleCapsule(packet.address, packet.port, capsule);
