@@ -71,11 +71,12 @@ message Entity {
 
 message GameState {
     uint32 tickCount = 1;
-    uint32 pauseTicks = 2;
-    Board board = 3;
-    repeated Entity cats = 4;
-    repeated Entity mice = 5;
-    repeated uint32 scores = 6;
-    uint64 rngState = 7;
-    GameEvent event = 8;
+    uint32 pauseUntil = 2;
+    uint32 eventEnd = 3;
+    Board board = 4;
+    repeated Entity cats = 5;
+    repeated Entity mice = 6;
+    repeated uint32 scores = 7;
+    uint64 rngState = 8;
+    GameEvent event = 9;
 }

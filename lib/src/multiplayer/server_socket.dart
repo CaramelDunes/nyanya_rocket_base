@@ -41,6 +41,7 @@ class ServerSocket extends CapsuleSocket {
   final Function() playerJoinCallback;
 
   HashMap<_AddressPort, ConnectionInfo> _connections = HashMap();
+  HashMap<int, _AddressPort> _ticketsToConnection = HashMap();
 
   ServerSocket(
       {@required int port,
@@ -78,6 +79,25 @@ class ServerSocket extends CapsuleSocket {
     _AddressPort key = _AddressPort(address, port);
     ConnectionInfo playerSequenceNumber =
         _connections.containsKey(key) ? _connections[key] : null;
+
+    if (tickets != null && capsule.hasPing() && playerSequenceNumber == null) {
+      int ticket = capsule.ping.ticket;
+
+      if (_ticketsToConnection.containsKey(ticket)) {
+        _AddressPort old = _ticketsToConnection[ticket];
+        playerSequenceNumber = _connections[old];
+
+        if (playerSequenceNumber == null ||
+            !CapsuleSocket.isSequenceNumberGreaterThan(
+                capsule.sequenceNumber, playerSequenceNumber.sequenceNumber)) {
+          return;
+        }
+
+        _ticketsToConnection[ticket] = key;
+        _connections[key] = _connections[old];
+        _connections.remove(old);
+      }
+    }
 
     if (capsule.hasRegister() && playerSequenceNumber == null) {
       if (capsule.sequenceNumber != 0) {

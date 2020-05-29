@@ -13,6 +13,7 @@ abstract class CapsuleSocket {
   RawDatagramSocket _socket;
 
   CapsuleSocket({int port = 0}) {
+    // TODO Maybe add option to bind to specific address too
     RawDatagramSocket.bind(InternetAddress.anyIPv4, port)
         .then((RawDatagramSocket socket) {
       _socket = socket;
@@ -23,7 +24,8 @@ abstract class CapsuleSocket {
     });
   }
 
-  void close() {
+  @mustCallSuper
+  void dispose() {
     _socket?.close();
   }
 

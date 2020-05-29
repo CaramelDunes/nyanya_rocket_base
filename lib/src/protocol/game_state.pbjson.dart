@@ -105,13 +105,14 @@ const GameState$json = const {
   '1': 'GameState',
   '2': const [
     const {'1': 'tickCount', '3': 1, '4': 1, '5': 13, '10': 'tickCount'},
-    const {'1': 'pauseTicks', '3': 2, '4': 1, '5': 13, '10': 'pauseTicks'},
-    const {'1': 'board', '3': 3, '4': 1, '5': 11, '6': '.Board', '10': 'board'},
-    const {'1': 'cats', '3': 4, '4': 3, '5': 11, '6': '.Entity', '10': 'cats'},
-    const {'1': 'mice', '3': 5, '4': 3, '5': 11, '6': '.Entity', '10': 'mice'},
-    const {'1': 'scores', '3': 6, '4': 3, '5': 13, '10': 'scores'},
-    const {'1': 'rngState', '3': 7, '4': 1, '5': 4, '10': 'rngState'},
-    const {'1': 'event', '3': 8, '4': 1, '5': 14, '6': '.GameEvent', '10': 'event'},
+    const {'1': 'pauseUntil', '3': 2, '4': 1, '5': 13, '10': 'pauseUntil'},
+    const {'1': 'eventEnd', '3': 3, '4': 1, '5': 13, '10': 'eventEnd'},
+    const {'1': 'board', '3': 4, '4': 1, '5': 11, '6': '.Board', '10': 'board'},
+    const {'1': 'cats', '3': 5, '4': 3, '5': 11, '6': '.Entity', '10': 'cats'},
+    const {'1': 'mice', '3': 6, '4': 3, '5': 11, '6': '.Entity', '10': 'mice'},
+    const {'1': 'scores', '3': 7, '4': 3, '5': 13, '10': 'scores'},
+    const {'1': 'rngState', '3': 8, '4': 1, '5': 4, '10': 'rngState'},
+    const {'1': 'event', '3': 9, '4': 1, '5': 14, '6': '.GameEvent', '10': 'event'},
   ],
 };
 

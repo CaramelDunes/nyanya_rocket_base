@@ -20,6 +20,10 @@ message PlayerNicknamesMessage {
     repeated string nicknames = 1;
 }
 
+message PingMessage {
+    uint32 ticket = 1;
+}
+
 message Capsule {
     uint32 protocolId = 1;
     uint32 sequenceNumber = 2;
@@ -30,5 +34,6 @@ message Capsule {
         RegisterMessage register = 5;
         RegisterSuccessMessage registerSuccess = 6;
         PlayerNicknamesMessage playerNicknames = 7;
+        PingMessage ping = 8;
     }
 }

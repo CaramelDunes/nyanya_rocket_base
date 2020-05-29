@@ -36,6 +36,13 @@ const PlayerNicknamesMessage$json = const {
   ],
 };
 
+const PingMessage$json = const {
+  '1': 'PingMessage',
+  '2': const [
+    const {'1': 'ticket', '3': 1, '4': 1, '5': 13, '10': 'ticket'},
+  ],
+};
+
 const Capsule$json = const {
   '1': 'Capsule',
   '2': const [
@@ -46,6 +53,7 @@ const Capsule$json = const {
     const {'1': 'register', '3': 5, '4': 1, '5': 11, '6': '.RegisterMessage', '9': 0, '10': 'register'},
     const {'1': 'registerSuccess', '3': 6, '4': 1, '5': 11, '6': '.RegisterSuccessMessage', '9': 0, '10': 'registerSuccess'},
     const {'1': 'playerNicknames', '3': 7, '4': 1, '5': 11, '6': '.PlayerNicknamesMessage', '9': 0, '10': 'playerNicknames'},
+    const {'1': 'ping', '3': 8, '4': 1, '5': 11, '6': '.PingMessage', '9': 0, '10': 'ping'},
   ],
   '8': const [
     const {'1': 'payload'},

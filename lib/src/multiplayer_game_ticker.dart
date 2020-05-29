@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart';
+import 'package:nyanya_rocket_base/nyanya_rocket_base.dart';
 import 'board.dart';
 import 'entity.dart';
 import 'game_ticker.dart';
@@ -28,17 +29,27 @@ import 'tile.dart';
 // Slow Down: https://youtu.be/eHWSrXzEV1I?t=824
 
 class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
-  int _eventTickDuration = 0;
-
   GameEvent _scheduledEvent = GameEvent.None;
   PlayerColor _eventOrigin;
-  GameEvent _nextEvent = GameEvent.None;
 
   final List<List<ArrowPosition>> placedArrows =
       List.generate(4, (_) => List(), growable: false);
 
   MultiplayerGameTicker(MultiplayerGameState game)
       : super(game, MultiplayerGameSimulator());
+
+  int microTicksPerTick() {
+    if (game.currentEvent == GameEvent.SpeedUp)
+      return 4;
+    else if (game.currentEvent == GameEvent.SlowDown)
+      return 1;
+    else
+      return 2;
+  }
+
+  int secondsInTicks(int seconds) {
+    return seconds * microTicksPerTick() * 60;
+  }
 
   bool placeArrow(int x, int y, PlayerColor player, Direction direction) {
     if (running && game.board.tiles[x][y] is Empty) {
@@ -79,17 +90,17 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
   @override
   void onEntityInRocket(Entity entity, int x, int y) {
     if (entity is SpecialMouse) {
-      _scheduledEvent = _nextEvent;
+      _scheduledEvent =
+          (gameSimulator as MultiplayerGameSimulator).randomGameEvent;
       _eventOrigin = (game.board.tiles[x][y] as Rocket).player;
     }
   }
 
   @override
   @mustCallSuper
-  void afterTick() {
-    if (_eventTickDuration > 1) {
-      _eventTickDuration--;
-    } else if (_eventTickDuration == 1) {
+  void afterUpdate() {
+    if (game.currentEvent != GameEvent.None &&
+        game.tickCount >= game.eventEnd) {
       uninstallGameEvent();
     }
 
@@ -99,18 +110,18 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
       _scheduledEvent = GameEvent.None;
     }
 
-    super.afterTick();
-    _nextEvent =
-        GameEvent.values[game.rng.nextInt(GameEvent.values.length - 1) + 1];
+    super.afterUpdate();
   }
 
   @protected
   @mustCallSuper
   void installGameEvent(GameEvent event) {
-    game.pauseTicks = GameTicker.durationInTicks(
-        Duration(seconds: 3)); // Animation duration = 3s
+    game.currentEvent = event;
 
-    _eventTickDuration = GameTicker.durationInTicks(Duration(seconds: 10));
+    game.pauseUntil = game.tickCount +
+        secondsInTicks(gameEventPauseDurationSeconds(event));
+    game.eventEnd =
+        game.pauseUntil + secondsInTicks(gameEventDurationSeconds(event));
 
     switch (event) {
       case GameEvent.CatMania:
@@ -122,17 +133,7 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
         game.cats.clear();
         break;
 
-      case GameEvent.SpeedUp:
-        _eventTickDuration = GameTicker.durationInTicks(Duration(seconds: 8));
-        break;
-
-      case GameEvent.SlowDown:
-        _eventTickDuration = GameTicker.durationInTicks(Duration(seconds: 8));
-        break;
-
       case GameEvent.MouseMonopoly:
-        _eventTickDuration = 1;
-
         // Cash-in all mice on board
         game.mice.forEach((mouse) {
           if (mouse is GoldenMouse) {
@@ -158,14 +159,9 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
             }
           }
         }
-
-        _eventTickDuration = 1;
         break;
 
       case GameEvent.PlaceAgain:
-        // Players got 3 seconds to place arrows.
-        game.pauseTicks += GameTicker.durationInTicks(Duration(seconds: 3));
-
         // TODO Get rid of that ugly thing
         for (int i = 0; i < Board.width; i++) {
           for (int j = 0; j < Board.height; j++) {
@@ -176,14 +172,9 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
         }
 
         placedArrows.forEach((List<ArrowPosition> list) => list.clear());
-
-        _eventTickDuration = 1; // 10 seconds
         break;
 
       case GameEvent.EverybodyMove:
-        // Players got 2 seconds to see where their rocket is.
-        game.pauseTicks += GameTicker.durationInTicks(Duration(seconds: 2));
-
         List<ArrowPosition> rocketPositions = List.filled(4, null);
 
         for (int i = 0; i < Board.width; i++) {
@@ -211,22 +202,18 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
           game.board.tiles[pos.x][pos.y] =
               Rocket(player: PlayerColor.values[i]);
         }
-
-        _eventTickDuration = 1;
         break;
 
+      case GameEvent.SpeedUp:
+      case GameEvent.SlowDown:
       case GameEvent.None:
         break;
     }
-
-    game.currentEvent = event;
   }
 
   @protected
   @mustCallSuper
   void uninstallGameEvent() {
-    _eventTickDuration = 0;
-
     switch (game.currentEvent) {
       case GameEvent.CatAttack:
         break;

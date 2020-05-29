@@ -22,7 +22,8 @@ enum GameEvent {
 class MultiplayerGameState extends GameState {
   GameEvent currentEvent = GameEvent.None;
   ExposedRandom _rng = ExposedRandom();
-  int pauseTicks = 0;
+  int pauseUntil = 0;
+  int eventEnd = 0;
 
   MultiplayerGameState() : super();
 
@@ -41,7 +42,8 @@ class MultiplayerGameState extends GameState {
 
     currentEvent = GameEvent.values[gameState.event.value];
     tickCount = gameState.tickCount;
-    pauseTicks = gameState.pauseTicks;
+    pauseUntil = gameState.pauseUntil;
+    eventEnd = gameState.eventEnd;
 
     _rng = ExposedRandom.withState(gameState.rngState.toInt());
   }
@@ -57,7 +59,8 @@ class MultiplayerGameState extends GameState {
     g.event = protocol.GameEvent.values[currentEvent.index];
 
     g.tickCount = tickCount;
-    g.pauseTicks = pauseTicks;
+    g.pauseUntil = pauseUntil;
+    g.eventEnd = eventEnd;
 
     g.rngState = Int64.fromInts(_rng.state >> 32, _rng.state);
 
@@ -65,4 +68,52 @@ class MultiplayerGameState extends GameState {
   }
 
   ExposedRandom get rng => _rng;
+}
+
+int gameEventDurationSeconds(GameEvent event) {
+  switch (event) {
+    case GameEvent.CatMania:
+    case GameEvent.MouseMania:
+    case GameEvent.SpeedUp:
+    case GameEvent.SlowDown:
+      return 10;
+      break;
+
+    // TODO Handle 'instantaneous events properly'
+    case GameEvent.MouseMonopoly:
+    case GameEvent.CatAttack:
+    case GameEvent.PlaceAgain:
+    case GameEvent.EverybodyMove:
+    case GameEvent.None:
+    default:
+      return 0;
+      break;
+  }
+}
+
+int gameEventPauseDurationSeconds(GameEvent event) {
+  switch (event) {
+    case GameEvent.CatMania:
+    case GameEvent.MouseMania:
+    case GameEvent.SpeedUp:
+    case GameEvent.SlowDown:
+      return 3;
+      break;
+
+    // TODO Handle 'instantaneous events properly'
+    case GameEvent.MouseMonopoly:
+    case GameEvent.CatAttack:
+    case GameEvent.EverybodyMove:
+      return 3 + 2;
+      break;
+
+    case GameEvent.PlaceAgain:
+      return 3 + 3;
+      break;
+
+    case GameEvent.None:
+    default:
+      return 0;
+      break;
+  }
 }

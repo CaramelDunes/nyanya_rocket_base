@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:meta/meta.dart';
 
@@ -20,6 +21,8 @@ class ClientSocket extends CapsuleSocket {
 
   int _serverSequenceNumber = -1;
 
+  Timer _pingTimer;
+
   ClientSocket(
       {@required this.serverAddress,
       @required this.serverPort,
@@ -27,17 +30,32 @@ class ClientSocket extends CapsuleSocket {
       @required this.gameStateCallback,
       @required this.playerRegisterSuccessCallback,
       @required this.playerNicknamesCallback,
-      this.ticket = null})
+      this.ticket = 0})
       : super();
+
+  @override
+  void dispose() {
+    _pingTimer?.cancel();
+
+    super.dispose();
+  }
 
   @override
   void onSocketReady() {
     RegisterMessage registerMessage = RegisterMessage()
-      ..nickname = nickname ?? ''
-      ..ticket = ticket ?? 0;
+      ..nickname = nickname ?? '';
+
+    if (ticket != null) {
+      registerMessage..ticket = ticket;
+    }
+
     Capsule capsule = Capsule()..register = registerMessage;
 
     sendCapsule(capsule, serverAddress, serverPort, true);
+
+    _pingTimer = Timer.periodic(Duration(seconds: 1), (_) {
+      _sendPing();
+    });
   }
 
   void sendArrowRequest(int x, int y, Direction direction) {
@@ -73,5 +91,16 @@ class ClientSocket extends CapsuleSocket {
 
       playerNicknamesCallback(playerNicknamesMessage.nicknames);
     }
+  }
+
+  void _sendPing() {
+    Capsule capsule = Capsule();
+    capsule.ping = PingMessage();
+
+    if (ticket != null) {
+      capsule.ping..ticket = ticket;
+    }
+
+    sendCapsule(capsule, serverAddress, serverPort, true);
   }
 }

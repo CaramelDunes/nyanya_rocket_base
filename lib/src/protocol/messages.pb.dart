@@ -161,12 +161,44 @@ class PlayerNicknamesMessage extends $pb.GeneratedMessage {
   $core.List<$core.String> get nicknames => $_getList(0);
 }
 
+class PingMessage extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('PingMessage', createEmptyInstance: create)
+    ..a<$core.int>(1, 'ticket', $pb.PbFieldType.OU3)
+    ..hasRequiredFields = false
+  ;
+
+  PingMessage._() : super();
+  factory PingMessage() => create();
+  factory PingMessage.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory PingMessage.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  PingMessage clone() => PingMessage()..mergeFromMessage(this);
+  PingMessage copyWith(void Function(PingMessage) updates) => super.copyWith((message) => updates(message as PingMessage));
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static PingMessage create() => PingMessage._();
+  PingMessage createEmptyInstance() => create();
+  static $pb.PbList<PingMessage> createRepeated() => $pb.PbList<PingMessage>();
+  @$core.pragma('dart2js:noInline')
+  static PingMessage getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PingMessage>(create);
+  static PingMessage _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get ticket => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set ticket($core.int v) { $_setUnsignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasTicket() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearTicket() => clearField(1);
+}
+
 enum Capsule_Payload {
   gameState, 
   placeArrow, 
   register, 
   registerSuccess, 
   playerNicknames, 
+  ping, 
   notSet
 }
 
@@ -177,10 +209,11 @@ class Capsule extends $pb.GeneratedMessage {
     5 : Capsule_Payload.register,
     6 : Capsule_Payload.registerSuccess,
     7 : Capsule_Payload.playerNicknames,
+    8 : Capsule_Payload.ping,
     0 : Capsule_Payload.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('Capsule', createEmptyInstance: create)
-    ..oo(0, [3, 4, 5, 6, 7])
+    ..oo(0, [3, 4, 5, 6, 7, 8])
     ..a<$core.int>(1, 'protocolId', $pb.PbFieldType.OU3, protoName: 'protocolId')
     ..a<$core.int>(2, 'sequenceNumber', $pb.PbFieldType.OU3, protoName: 'sequenceNumber')
     ..aOM<$0.GameState>(3, 'gameState', protoName: 'gameState', subBuilder: $0.GameState.create)
@@ -188,6 +221,7 @@ class Capsule extends $pb.GeneratedMessage {
     ..aOM<RegisterMessage>(5, 'register', subBuilder: RegisterMessage.create)
     ..aOM<RegisterSuccessMessage>(6, 'registerSuccess', protoName: 'registerSuccess', subBuilder: RegisterSuccessMessage.create)
     ..aOM<PlayerNicknamesMessage>(7, 'playerNicknames', protoName: 'playerNicknames', subBuilder: PlayerNicknamesMessage.create)
+    ..aOM<PingMessage>(8, 'ping', subBuilder: PingMessage.create)
     ..hasRequiredFields = false
   ;
 
@@ -281,5 +315,16 @@ class Capsule extends $pb.GeneratedMessage {
   void clearPlayerNicknames() => clearField(7);
   @$pb.TagNumber(7)
   PlayerNicknamesMessage ensurePlayerNicknames() => $_ensure(6);
+
+  @$pb.TagNumber(8)
+  PingMessage get ping => $_getN(7);
+  @$pb.TagNumber(8)
+  set ping(PingMessage v) { setField(8, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasPing() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearPing() => clearField(8);
+  @$pb.TagNumber(8)
+  PingMessage ensurePing() => $_ensure(7);
 }
 

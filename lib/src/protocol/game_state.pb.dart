@@ -188,13 +188,14 @@ class Entity extends $pb.GeneratedMessage {
 class GameState extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('GameState', createEmptyInstance: create)
     ..a<$core.int>(1, 'tickCount', $pb.PbFieldType.OU3, protoName: 'tickCount')
-    ..a<$core.int>(2, 'pauseTicks', $pb.PbFieldType.OU3, protoName: 'pauseTicks')
-    ..aOM<Board>(3, 'board', subBuilder: Board.create)
-    ..pc<Entity>(4, 'cats', $pb.PbFieldType.PM, subBuilder: Entity.create)
-    ..pc<Entity>(5, 'mice', $pb.PbFieldType.PM, subBuilder: Entity.create)
-    ..p<$core.int>(6, 'scores', $pb.PbFieldType.PU3)
-    ..a<$fixnum.Int64>(7, 'rngState', $pb.PbFieldType.OU6, protoName: 'rngState', defaultOrMaker: $fixnum.Int64.ZERO)
-    ..e<GameEvent>(8, 'event', $pb.PbFieldType.OE, defaultOrMaker: GameEvent.NO_EVENT, valueOf: GameEvent.valueOf, enumValues: GameEvent.values)
+    ..a<$core.int>(2, 'pauseUntil', $pb.PbFieldType.OU3, protoName: 'pauseUntil')
+    ..a<$core.int>(3, 'eventEnd', $pb.PbFieldType.OU3, protoName: 'eventEnd')
+    ..aOM<Board>(4, 'board', subBuilder: Board.create)
+    ..pc<Entity>(5, 'cats', $pb.PbFieldType.PM, subBuilder: Entity.create)
+    ..pc<Entity>(6, 'mice', $pb.PbFieldType.PM, subBuilder: Entity.create)
+    ..p<$core.int>(7, 'scores', $pb.PbFieldType.PU3)
+    ..a<$fixnum.Int64>(8, 'rngState', $pb.PbFieldType.OU6, protoName: 'rngState', defaultOrMaker: $fixnum.Int64.ZERO)
+    ..e<GameEvent>(9, 'event', $pb.PbFieldType.OE, defaultOrMaker: GameEvent.NO_EVENT, valueOf: GameEvent.valueOf, enumValues: GameEvent.values)
     ..hasRequiredFields = false
   ;
 
@@ -223,50 +224,59 @@ class GameState extends $pb.GeneratedMessage {
   void clearTickCount() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.int get pauseTicks => $_getIZ(1);
+  $core.int get pauseUntil => $_getIZ(1);
   @$pb.TagNumber(2)
-  set pauseTicks($core.int v) { $_setUnsignedInt32(1, v); }
+  set pauseUntil($core.int v) { $_setUnsignedInt32(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasPauseTicks() => $_has(1);
+  $core.bool hasPauseUntil() => $_has(1);
   @$pb.TagNumber(2)
-  void clearPauseTicks() => clearField(2);
+  void clearPauseUntil() => clearField(2);
 
   @$pb.TagNumber(3)
-  Board get board => $_getN(2);
+  $core.int get eventEnd => $_getIZ(2);
   @$pb.TagNumber(3)
-  set board(Board v) { setField(3, v); }
+  set eventEnd($core.int v) { $_setUnsignedInt32(2, v); }
   @$pb.TagNumber(3)
-  $core.bool hasBoard() => $_has(2);
+  $core.bool hasEventEnd() => $_has(2);
   @$pb.TagNumber(3)
-  void clearBoard() => clearField(3);
-  @$pb.TagNumber(3)
-  Board ensureBoard() => $_ensure(2);
+  void clearEventEnd() => clearField(3);
 
   @$pb.TagNumber(4)
-  $core.List<Entity> get cats => $_getList(3);
+  Board get board => $_getN(3);
+  @$pb.TagNumber(4)
+  set board(Board v) { setField(4, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasBoard() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearBoard() => clearField(4);
+  @$pb.TagNumber(4)
+  Board ensureBoard() => $_ensure(3);
 
   @$pb.TagNumber(5)
-  $core.List<Entity> get mice => $_getList(4);
+  $core.List<Entity> get cats => $_getList(4);
 
   @$pb.TagNumber(6)
-  $core.List<$core.int> get scores => $_getList(5);
+  $core.List<Entity> get mice => $_getList(5);
 
   @$pb.TagNumber(7)
-  $fixnum.Int64 get rngState => $_getI64(6);
-  @$pb.TagNumber(7)
-  set rngState($fixnum.Int64 v) { $_setInt64(6, v); }
-  @$pb.TagNumber(7)
-  $core.bool hasRngState() => $_has(6);
-  @$pb.TagNumber(7)
-  void clearRngState() => clearField(7);
+  $core.List<$core.int> get scores => $_getList(6);
 
   @$pb.TagNumber(8)
-  GameEvent get event => $_getN(7);
+  $fixnum.Int64 get rngState => $_getI64(7);
   @$pb.TagNumber(8)
-  set event(GameEvent v) { setField(8, v); }
+  set rngState($fixnum.Int64 v) { $_setInt64(7, v); }
   @$pb.TagNumber(8)
-  $core.bool hasEvent() => $_has(7);
+  $core.bool hasRngState() => $_has(7);
   @$pb.TagNumber(8)
-  void clearEvent() => clearField(8);
+  void clearRngState() => clearField(8);
+
+  @$pb.TagNumber(9)
+  GameEvent get event => $_getN(8);
+  @$pb.TagNumber(9)
+  set event(GameEvent v) { setField(9, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasEvent() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearEvent() => clearField(9);
 }
 

@@ -35,16 +35,18 @@ class GameServer extends MultiplayerGameTicker {
         tickets: tickets);
   }
 
-  void close() {
-    _socket.close();
-    super.close();
+  @override
+  void dispose() {
+    _socket.dispose();
+
+    super.dispose();
   }
 
   @override
-  void afterTick() {
-    super.afterTick();
+  void afterUpdate() {
+    super.afterUpdate();
 
-    if (game.tickCount % 30 == 0 || _forceSendNextTick) {
+    if (game.tickCount % 60 == 0 || _forceSendNextTick) {
       _socket.sendGameState(game);
       _forceSendNextTick = false;
     }

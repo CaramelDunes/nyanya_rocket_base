@@ -2,33 +2,43 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 
-import 'board.dart';
 import 'entity.dart';
 import 'simulators/game_simulator.dart';
 import 'state/game_state.dart';
 import 'tile.dart';
 
 class GameTicker<T extends GameState> {
-  static const Duration tickPeriod = Duration(milliseconds: 16);
+  static const Duration updatePeriod = Duration(microseconds: 16667);
+  static const int updateFrequency = 60;
+
+  static const Duration _clockPeriod = Duration(microseconds: 8334);
 
   T _game;
   final GameSimulator gameSimulator;
 
-  Timer _timer;
+  Timer _updateTimer;
+  DateTime _previousClock = DateTime.now();
+  Duration _timeAccumulator = Duration.zero;
 
   bool running = false;
 
   GameTicker(this._game, this.gameSimulator) {
-    _timer = Timer.periodic(tickPeriod, _tick);
-
     gameSimulator.onMouseEaten = onMouseEaten;
     gameSimulator.onEntityInPit = onEntityInPit;
     gameSimulator.onEntityInRocket = onEntityInRocket;
     gameSimulator.onArrowExpiry = onArrowExpiry;
-  }
 
-  static int durationInTicks(Duration duration) {
-    return (duration.inMilliseconds / tickPeriod.inMilliseconds).floor();
+    _updateTimer = Timer.periodic(_clockPeriod, (_) {
+      DateTime now = DateTime.now();
+      Duration delta = now.difference(_previousClock);
+      _previousClock = now;
+      _timeAccumulator += delta;
+
+      while (_timeAccumulator >= GameTicker.updatePeriod) {
+        _timeAccumulator -= GameTicker.updatePeriod;
+        update();
+      }
+    });
   }
 
   T get game => _game;
@@ -38,35 +48,24 @@ class GameTicker<T extends GameState> {
   }
 
   @protected
-  void beforeTick() {}
+  void beforeUpdate() {}
 
   @protected
-  void afterTick() {}
+  void afterUpdate() {}
 
-  void _tick(Timer _) {
+  void update() {
     if (running) {
-      beforeTick();
+      beforeUpdate();
 
-      gameSimulator.tick(_game);
+      gameSimulator.update(_game);
 
-      afterTick();
-    }
-  }
-
-  void departRockets() {
-    for (int x = 0; x < Board.width; x++) {
-      for (int y = 0; y < Board.height; y++) {
-        if (game.board.tiles[x][y] is Rocket) {
-          game.board.tiles[x][y] = Rocket.departed(
-              player: (game.board.tiles[x][y] as Rocket).player);
-        }
-      }
+      afterUpdate();
     }
   }
 
   @mustCallSuper
-  void close() {
-    _timer.cancel();
+  void dispose() {
+    _updateTimer.cancel();
   }
 
   @protected

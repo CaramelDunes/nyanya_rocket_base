@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:meta/meta.dart';
 
 import '../board.dart';
 import '../entity.dart';
@@ -20,18 +21,18 @@ abstract class GameSimulator<StateType extends GameState> {
   EntityInRocketCallback onEntityInRocket;
   ArrowExpiredCallback onArrowExpiry;
 
-  void tick(StateType gameState) {
-    microTick(gameState);
+  void update(StateType gameState) {
+    tick(gameState);
 
     switch (speed) {
       case GameSpeed.Normal:
-        microTick(gameState);
+        tick(gameState);
         break;
 
       case GameSpeed.Fast:
-        microTick(gameState);
-        microTick(gameState);
-        microTick(gameState);
+        tick(gameState);
+        tick(gameState);
+        tick(gameState);
         break;
 
       case GameSpeed.Slow:
@@ -39,7 +40,19 @@ abstract class GameSimulator<StateType extends GameState> {
     }
   }
 
-  void microTick(StateType gameState) {
+  void departRockets(StateType gameState) {
+    for (int x = 0; x < Board.width; x++) {
+      for (int y = 0; y < Board.height; y++) {
+        if (gameState.board.tiles[x][y] is Rocket) {
+          gameState.board.tiles[x][y] = Rocket.departed(
+              player: (gameState.board.tiles[x][y] as Rocket).player);
+        }
+      }
+    }
+  }
+
+  @protected
+  void tick(StateType gameState) {
     _tickEntities(gameState);
     _tickTiles(gameState);
 
