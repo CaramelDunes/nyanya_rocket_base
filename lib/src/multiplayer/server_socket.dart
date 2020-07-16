@@ -77,29 +77,32 @@ class ServerSocket extends CapsuleSocket {
   @override
   void handleCapsule(InternetAddress address, int port, Capsule capsule) {
     _AddressPort key = _AddressPort(address, port);
-    ConnectionInfo playerSequenceNumber =
-        _connections.containsKey(key) ? _connections[key] : null;
+    ConnectionInfo playerConnectionInfo = _connections[key];
 
-    if (tickets != null && capsule.hasPing() && playerSequenceNumber == null) {
+    if (tickets != null && capsule.hasPing()) {
       int ticket = capsule.ping.ticket;
 
+      // If player has a valid ticket.
       if (_ticketsToConnection.containsKey(ticket)) {
         _AddressPort old = _ticketsToConnection[ticket];
-        playerSequenceNumber = _connections[old];
+        playerConnectionInfo = _connections[old];
 
-        if (playerSequenceNumber == null ||
+        // Discard if ping message is outdated.
+        if (playerConnectionInfo == null ||
             !CapsuleSocket.isSequenceNumberGreaterThan(
-                capsule.sequenceNumber, playerSequenceNumber.sequenceNumber)) {
+                capsule.sequenceNumber, playerConnectionInfo.sequenceNumber)) {
           return;
         }
 
+        // Update player IP address and port.
         _ticketsToConnection[ticket] = key;
         _connections[key] = _connections[old];
         _connections.remove(old);
       }
     }
 
-    if (capsule.hasRegister() && playerSequenceNumber == null) {
+    // If this is a registration message and the player hasn't been registered yet, register it
+    if (capsule.hasRegister() && playerConnectionInfo == null) {
       if (capsule.sequenceNumber != 0) {
         print('Received non-zero sequence id in a registration packet.');
         return;
@@ -135,9 +138,10 @@ class ServerSocket extends CapsuleSocket {
       _sendNicknames();
 
       playerJoinCallback();
-    } else if (playerSequenceNumber == null ||
+      // else if player is registered and message sequence number is less than previously seen, drop message
+    } else if (playerConnectionInfo == null ||
         !CapsuleSocket.isSequenceNumberGreaterThan(
-            capsule.sequenceNumber, playerSequenceNumber.sequenceNumber)) {
+            capsule.sequenceNumber, playerConnectionInfo.sequenceNumber)) {
       return;
     }
 
@@ -150,7 +154,7 @@ class ServerSocket extends CapsuleSocket {
           placeArrowMessage.x,
           placeArrowMessage.y,
           Direction.values[placeArrowMessage.direction.value],
-          playerSequenceNumber.playerColor);
+          playerConnectionInfo.playerColor);
     }
   }
 }
