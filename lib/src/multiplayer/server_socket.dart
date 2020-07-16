@@ -95,8 +95,8 @@ class ServerSocket extends CapsuleSocket {
         }
 
         // Update player IP address and port.
-        _ticketsToConnection[ticket] = key;
         _connections[key] = _connections[old];
+        _ticketsToConnection[ticket] = key;
         _connections.remove(old);
       }
     }
@@ -138,6 +138,7 @@ class ServerSocket extends CapsuleSocket {
       _sendNicknames();
 
       playerJoinCallback();
+      _ticketsToConnection[registerMessage.ticket] = key;
       // else if player is registered and message sequence number is less than previously seen, drop message
     } else if (playerConnectionInfo == null ||
         !CapsuleSocket.isSequenceNumberGreaterThan(
