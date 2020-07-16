@@ -77,85 +77,101 @@ class ServerSocket extends CapsuleSocket {
   @override
   void handleCapsule(InternetAddress address, int port, Capsule capsule) {
     _AddressPort key = _AddressPort(address, port);
-    ConnectionInfo playerConnectionInfo = _connections[key];
 
-    if (tickets != null && capsule.hasPing()) {
-      int ticket = capsule.ping.ticket;
+    switch (capsule.whichPayload()) {
+      case Capsule_Payload.ping:
+        // Connection switching is only supported with tickets.
+        if (tickets != null && !_connections.containsKey(key)) {
+          int ticket = capsule.ping.ticket;
 
-      // If player has a valid ticket.
-      if (_ticketsToConnection.containsKey(ticket)) {
-        _AddressPort old = _ticketsToConnection[ticket];
-        playerConnectionInfo = _connections[old];
+          // If player has a valid ticket.
+          if (_ticketsToConnection.containsKey(ticket)) {
+            _AddressPort old = _ticketsToConnection[ticket];
+            ConnectionInfo playerConnectionInfo = _connections[old];
 
-        // Discard if ping message is outdated.
-        if (playerConnectionInfo == null ||
-            !CapsuleSocket.isSequenceNumberGreaterThan(
+            // Discard if ping message is outdated or connection info
+            // could not be found (shouldn't happen here).
+            if (playerConnectionInfo == null ||
+                !CapsuleSocket.isSequenceNumberGreaterThan(
+                    capsule.sequenceNumber,
+                    playerConnectionInfo.sequenceNumber)) {
+              return;
+            }
+
+            // Update player IP address and port.
+            _connections[key] = _connections[old];
+            _ticketsToConnection[ticket] = key;
+            _connections.remove(old);
+          }
+        }
+        break;
+
+      case Capsule_Payload.register:
+        if (!_connections.containsKey(key)) {
+          if (capsule.sequenceNumber != 0) {
+            print('Received non-zero sequence id in a registration packet.');
+            return;
+          }
+
+          RegisterMessage registerMessage = capsule.register;
+
+          // If tickets have been specified, they are required
+          if (tickets != null) {
+            if (registerMessage.hasTicket() &&
+                tickets.contains(registerMessage.ticket)) {
+              // Burn ticket
+              tickets.remove(registerMessage.ticket);
+              print('Ticket ${registerMessage.ticket} burned.');
+            } else {
+              print('Wrong ticket received!');
+              return;
+            }
+          }
+
+          _connections[key] = ConnectionInfo(
+              PlayerColor.values[_connections.length],
+              registerMessage.nickname);
+          _ticketsToConnection[registerMessage.ticket] = key;
+
+          print('New player ${registerMessage.nickname}');
+
+          RegisterSuccessMessage reply = RegisterSuccessMessage()
+            ..givenColor =
+                _connections[key].playerColor.toProtocolPlayerColor();
+
+          Capsule response = Capsule()..registerSuccess = reply;
+          sendCapsule(response, key.address, key.port, true);
+
+          // Notify everyone
+          _sendNicknames();
+
+          playerJoinCallback();
+        }
+        break;
+
+      case Capsule_Payload.placeArrow:
+        ConnectionInfo playerConnectionInfo = _connections[key];
+
+        if (playerConnectionInfo != null &&
+            CapsuleSocket.isSequenceNumberGreaterThan(
                 capsule.sequenceNumber, playerConnectionInfo.sequenceNumber)) {
-          return;
+          playerConnectionInfo.sequenceNumber = capsule.sequenceNumber;
+
+          PlaceArrowMessage placeArrowMessage = capsule.placeArrow;
+
+          placeArrowCallback(
+              placeArrowMessage.x,
+              placeArrowMessage.y,
+              Direction.values[placeArrowMessage.direction.value],
+              playerConnectionInfo.playerColor);
         }
+        break;
 
-        // Update player IP address and port.
-        _connections[key] = _connections[old];
-        _ticketsToConnection[ticket] = key;
-        _connections.remove(old);
-      }
-    }
-
-    // If this is a registration message and the player hasn't been registered yet, register it
-    if (capsule.hasRegister() && playerConnectionInfo == null) {
-      if (capsule.sequenceNumber != 0) {
-        print('Received non-zero sequence id in a registration packet.');
-        return;
-      }
-
-      RegisterMessage registerMessage = capsule.register;
-
-      // If tickets have been specified, they are required
-      if (tickets != null) {
-        if (registerMessage.hasTicket() &&
-            tickets.contains(registerMessage.ticket)) {
-          // Burn ticket
-          tickets.remove(registerMessage.ticket);
-          print('Ticket ${registerMessage.ticket} burned.');
-        } else {
-          print('Wrong ticket received!');
-          return;
-        }
-      }
-
-      _connections[key] = ConnectionInfo(
-          PlayerColor.values[_connections.length], registerMessage.nickname);
-
-      print('New player ${registerMessage.nickname}');
-
-      RegisterSuccessMessage reply = RegisterSuccessMessage()
-        ..givenColor = _connections[key].playerColor.toProtocolPlayerColor();
-
-      Capsule response = Capsule()..registerSuccess = reply;
-      sendCapsule(response, key.address, key.port, true);
-
-      // Notify everyone
-      _sendNicknames();
-
-      playerJoinCallback();
-      _ticketsToConnection[registerMessage.ticket] = key;
-      // else if player is registered and message sequence number is less than previously seen, drop message
-    } else if (playerConnectionInfo == null ||
-        !CapsuleSocket.isSequenceNumberGreaterThan(
-            capsule.sequenceNumber, playerConnectionInfo.sequenceNumber)) {
-      return;
-    }
-
-    _connections[key].sequenceNumber = capsule.sequenceNumber;
-
-    if (capsule.hasPlaceArrow()) {
-      PlaceArrowMessage placeArrowMessage = capsule.placeArrow;
-
-      placeArrowCallback(
-          placeArrowMessage.x,
-          placeArrowMessage.y,
-          Direction.values[placeArrowMessage.direction.value],
-          playerConnectionInfo.playerColor);
+      case Capsule_Payload.gameState:
+      case Capsule_Payload.registerSuccess:
+      case Capsule_Payload.playerNicknames:
+      case Capsule_Payload.notSet:
+        break;
     }
   }
 }
