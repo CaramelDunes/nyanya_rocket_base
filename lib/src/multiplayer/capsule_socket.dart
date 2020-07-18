@@ -9,18 +9,19 @@ abstract class CapsuleSocket {
   static const int protocolId = 0x1ba51999;
   static const int redundancyCount = 5;
 
+  final int boundPort;
+
   int _mySequenceNumber = 0;
   RawDatagramSocket _socket;
 
-  CapsuleSocket({int port = 0}) {
-    // TODO Maybe add option to bind to specific address too
-    RawDatagramSocket.bind(InternetAddress.anyIPv4, port)
+  CapsuleSocket({this.boundPort = 0}) {
+    RawDatagramSocket.bind(InternetAddress.anyIPv4, boundPort)
         .then((RawDatagramSocket socket) {
       _socket = socket;
       _socket.listen(_handleSocketEvent);
 
       onSocketReady();
-      print('Listening on port $port');
+      print('Listening on port $boundPort');
     });
   }
 
@@ -85,6 +86,18 @@ abstract class CapsuleSocket {
           print('Received invalid protocol id!');
         }
       }
+    } else if (event == RawSocketEvent.closed ||
+        event == RawSocketEvent.readClosed) {
+      _socket.close();
+      _socket = null;
+
+      RawDatagramSocket.bind(InternetAddress.anyIPv4, boundPort)
+          .then((RawDatagramSocket socket) {
+        _socket = socket;
+        _socket.listen(_handleSocketEvent);
+
+        print('Listening on port $boundPort');
+      });
     }
   }
 }

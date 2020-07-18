@@ -26,12 +26,12 @@ class _AddressPort {
   }
 }
 
-class ConnectionInfo {
+class _ConnectionInfo {
   final PlayerColor playerColor;
   final String nickname;
   int sequenceNumber = 0;
 
-  ConnectionInfo(this.playerColor, this.nickname);
+  _ConnectionInfo(this.playerColor, this.nickname);
 }
 
 class ServerSocket extends CapsuleSocket {
@@ -40,7 +40,7 @@ class ServerSocket extends CapsuleSocket {
       placeArrowCallback;
   final Function() playerJoinCallback;
 
-  HashMap<_AddressPort, ConnectionInfo> _connections = HashMap();
+  HashMap<_AddressPort, _ConnectionInfo> _connections = HashMap();
   HashMap<int, _AddressPort> _ticketsToConnection = HashMap();
 
   ServerSocket(
@@ -48,7 +48,7 @@ class ServerSocket extends CapsuleSocket {
       @required this.placeArrowCallback,
       @required this.playerJoinCallback,
       this.tickets = null})
-      : super(port: port);
+      : super(boundPort: port);
 
   void sendGameState(MultiplayerGameState game) {
     protocol.GameState state = game.toProtocolGameState();
@@ -63,7 +63,7 @@ class ServerSocket extends CapsuleSocket {
     PlayerNicknamesMessage playerNicknamesMessage = PlayerNicknamesMessage();
     playerNicknamesMessage.nicknames.addAll(['', '', '', '']);
 
-    _connections.values.forEach((ConnectionInfo info) {
+    _connections.values.forEach((_ConnectionInfo info) {
       playerNicknamesMessage.nicknames[info.playerColor.index] = info.nickname;
     });
 
@@ -87,7 +87,7 @@ class ServerSocket extends CapsuleSocket {
           // If player has a valid ticket.
           if (_ticketsToConnection.containsKey(ticket)) {
             _AddressPort old = _ticketsToConnection[ticket];
-            ConnectionInfo playerConnectionInfo = _connections[old];
+            _ConnectionInfo playerConnectionInfo = _connections[old];
 
             // Discard if ping message is outdated or connection info
             // could not be found (shouldn't happen here).
@@ -99,9 +99,8 @@ class ServerSocket extends CapsuleSocket {
             }
 
             // Update player IP address and port.
-            _connections[key] = _connections[old];
             _ticketsToConnection[ticket] = key;
-            _connections.remove(old);
+            _connections[key] = _connections.remove(old);
           }
         }
         break;
@@ -128,7 +127,7 @@ class ServerSocket extends CapsuleSocket {
             }
           }
 
-          _connections[key] = ConnectionInfo(
+          _connections[key] = _ConnectionInfo(
               PlayerColor.values[_connections.length],
               registerMessage.nickname);
           _ticketsToConnection[registerMessage.ticket] = key;
@@ -150,7 +149,7 @@ class ServerSocket extends CapsuleSocket {
         break;
 
       case Capsule_Payload.placeArrow:
-        ConnectionInfo playerConnectionInfo = _connections[key];
+        _ConnectionInfo playerConnectionInfo = _connections[key];
 
         if (playerConnectionInfo != null &&
             CapsuleSocket.isSequenceNumberGreaterThan(
