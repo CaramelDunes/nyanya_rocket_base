@@ -118,8 +118,8 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
   void installGameEvent(GameEvent event) {
     game.currentEvent = event;
 
-    game.pauseUntil = game.tickCount +
-        secondsInTicks(gameEventPauseDurationSeconds(event));
+    game.pauseUntil =
+        game.tickCount + secondsInTicks(gameEventPauseDurationSeconds(event));
     game.eventEnd =
         game.pauseUntil + secondsInTicks(gameEventDurationSeconds(event));
 
@@ -175,33 +175,34 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
         break;
 
       case GameEvent.EverybodyMove:
-        List<ArrowPosition> rocketPositions = List.filled(4, null);
+        List<PlayerColor> rocketColors = List();
+        List<ArrowPosition> rocketPositions = List();
 
         for (int i = 0; i < Board.width; i++) {
           for (int j = 0; j < Board.height; j++) {
             if (game.board.tiles[i][j] is Rocket) {
-              rocketPositions[(game.board.tiles[i][j] as Rocket).player.index] =
-                  ArrowPosition(i, j);
+              rocketColors.add((game.board.tiles[i][j] as Rocket).player);
+              rocketPositions.add(ArrowPosition(i, j));
             }
           }
         }
 
-        assert(rocketPositions[0] != null &&
-            rocketPositions[1] != null &&
-            rocketPositions[2] != null &&
-            rocketPositions[3] != null);
+        if (rocketPositions.length < 2) {
+          // Cannot shuffle a one-element list.
+          break;
+        }
 
-        var derangement = List.of(rocketPositions);
+        // Create a copy of current rocket positions.
+        List<ArrowPosition> derangement = List.of(rocketPositions);
 
-        while (!_isDerangement(rocketPositions, derangement)) {
+        do {
           derangement.shuffle(game.rng);
-        }
+        } while (!_isDerangement(rocketPositions, derangement));
 
-        for (int i = 0; i < 4; i++) {
+        rocketColors.asMap().forEach((i, color) {
           ArrowPosition pos = derangement[i];
-          game.board.tiles[pos.x][pos.y] =
-              Rocket(player: PlayerColor.values[i]);
-        }
+          game.board.tiles[pos.x][pos.y] = Rocket(player: color);
+        });
         break;
 
       case GameEvent.SpeedUp:
