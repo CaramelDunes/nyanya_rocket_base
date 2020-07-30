@@ -19,9 +19,9 @@ const PlayerColor$json = const {
   '1': 'PlayerColor',
   '2': const [
     const {'1': 'BLUE', '2': 0},
-    const {'1': 'YELLOW', '2': 1},
-    const {'1': 'RED', '2': 2},
-    const {'1': 'GREEN', '2': 3},
+    const {'1': 'RED', '2': 1},
+    const {'1': 'GREEN', '2': 2},
+    const {'1': 'YELLOW', '2': 3},
   ],
 };
 

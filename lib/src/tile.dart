@@ -22,15 +22,15 @@ class PlayerColor {
       protocol.PlayerColor.values[index];
 
   static const Blue = const PlayerColor._internal(0);
-  static const Yellow = const PlayerColor._internal(1);
-  static const Red = const PlayerColor._internal(2);
-  static const Green = const PlayerColor._internal(3);
+  static const Red = const PlayerColor._internal(1);
+  static const Green = const PlayerColor._internal(2);
+  static const Yellow = const PlayerColor._internal(3);
 
   static const List<PlayerColor> values = const <PlayerColor>[
     Blue,
-    Yellow,
     Red,
     Green,
+    Yellow,
   ];
 }
 

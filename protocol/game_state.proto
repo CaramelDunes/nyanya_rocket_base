@@ -9,9 +9,9 @@ enum Direction {
 
 enum PlayerColor {
     BLUE = 0;
-    YELLOW = 1;
-    RED = 2;
-    GREEN = 3;
+    RED = 1;
+    GREEN = 2;
+    YELLOW = 3;
 }
 
 enum Wall {

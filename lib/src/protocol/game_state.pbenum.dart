@@ -30,15 +30,15 @@ class Direction extends $pb.ProtobufEnum {
 
 class PlayerColor extends $pb.ProtobufEnum {
   static const PlayerColor BLUE = PlayerColor._(0, 'BLUE');
-  static const PlayerColor YELLOW = PlayerColor._(1, 'YELLOW');
-  static const PlayerColor RED = PlayerColor._(2, 'RED');
-  static const PlayerColor GREEN = PlayerColor._(3, 'GREEN');
+  static const PlayerColor RED = PlayerColor._(1, 'RED');
+  static const PlayerColor GREEN = PlayerColor._(2, 'GREEN');
+  static const PlayerColor YELLOW = PlayerColor._(3, 'YELLOW');
 
   static const $core.List<PlayerColor> values = <PlayerColor> [
     BLUE,
-    YELLOW,
     RED,
     GREEN,
+    YELLOW,
   ];
 
   static final $core.Map<$core.int, PlayerColor> _byValue = $pb.ProtobufEnum.initByValue(values);
