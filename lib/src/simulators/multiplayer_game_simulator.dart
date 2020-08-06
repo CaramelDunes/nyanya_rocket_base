@@ -6,7 +6,7 @@ import 'game_simulator.dart';
 
 class MultiplayerGameSimulator extends GameSimulator<MultiplayerGameState>
     with MultiplayerGenerator {
-  GameEvent randomGameEvent = GameEvent.None;
+  GameEvent _nextGameEvent = GameEvent.None;
 
   @override
   void update(MultiplayerGameState gameState) {
@@ -29,7 +29,7 @@ class MultiplayerGameSimulator extends GameSimulator<MultiplayerGameState>
       super.tick(gameState);
     }
 
-    randomGameEvent = GameEvent
+    _nextGameEvent = GameEvent
         .values[gameState.rng.nextInt(GameEvent.values.length - 1) + 1];
   }
 
@@ -38,4 +38,6 @@ class MultiplayerGameSimulator extends GameSimulator<MultiplayerGameState>
       tick(gameState);
     }
   }
+
+  GameEvent get nextGameEvent => _nextGameEvent;
 }

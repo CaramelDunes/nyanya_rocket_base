@@ -7,7 +7,7 @@ import '../protocol/messages.pb.dart';
 
 abstract class CapsuleSocket {
   static const int protocolId = 0x1ba51999;
-  static const int redundancyCount = 5;
+  static const int _redundancyCount = 5;
 
   final int boundPort;
 
@@ -21,7 +21,8 @@ abstract class CapsuleSocket {
       _socket.listen(_handleSocketEvent);
 
       onSocketReady();
-      print('Listening on port $boundPort');
+
+      print('Listening on port ${socket.port}');
     });
   }
 
@@ -46,7 +47,7 @@ abstract class CapsuleSocket {
     capsule.sequenceNumber = _mySequenceNumber;
     Uint8List payload = capsule.writeToBuffer();
 
-    int copies = sendCopies ? redundancyCount : 1;
+    int copies = sendCopies ? _redundancyCount : 1;
     for (int i = 0; i < copies; i++) {
       _socket.send(payload, address, port);
     }
@@ -96,7 +97,7 @@ abstract class CapsuleSocket {
         _socket = socket;
         _socket.listen(_handleSocketEvent);
 
-        print('Listening on port $boundPort');
+        print('Listening on port ${socket.port}');
       });
     }
   }

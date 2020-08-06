@@ -69,11 +69,7 @@ abstract class GameSimulator<StateType extends GameState> {
       for (Cat cat in gameState.cats) {
         if (_colliding(mouse, cat)) {
           dead = true;
-
-          if (onMouseEaten != null) {
-            onMouseEaten(mouse, cat);
-          }
-
+          onMouseEaten?.call(mouse, cat);
           break;
         }
       }
@@ -101,9 +97,7 @@ abstract class GameSimulator<StateType extends GameState> {
         Arrow arrow = tile as Arrow;
 
         if (arrow.expiration <= 1) {
-          if (onArrowExpiry != null) {
-            onArrowExpiry(arrow, x, y);
-          }
+          onArrowExpiry?.call(arrow, x, y);
         }
 
         return arrow.withExpiration(arrow.expiration - 1);
@@ -150,9 +144,7 @@ abstract class GameSimulator<StateType extends GameState> {
 
     switch (tile.runtimeType) {
       case Pit:
-        if (onEntityInPit != null) {
-          onEntityInPit(e, e.position.x, e.position.y);
-        }
+        onEntityInPit?.call(e, e.position.x, e.position.y);
         return null;
         break;
 
@@ -170,13 +162,9 @@ abstract class GameSimulator<StateType extends GameState> {
             gameState.scores[rocket.player.index]++;
           }
 
-          if (onEntityInRocket != null) {
-            onEntityInRocket(e, e.position.x, e.position.y);
-          }
+          onEntityInRocket?.call(e, e.position.x, e.position.y);
         } else {
-          if (onEntityInPit != null) {
-            onEntityInPit(e, e.position.x, e.position.y);
-          }
+          onEntityInPit?.call(e, e.position.x, e.position.y);
         }
         return null;
         break;

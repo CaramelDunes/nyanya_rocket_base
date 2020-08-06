@@ -3,10 +3,16 @@ import 'package:nyanya_rocket_base/nyanya_rocket_base.dart';
 import 'board.dart';
 import 'entity.dart';
 import 'game_ticker.dart';
-import 'multiplayer/game_server.dart';
 import 'simulators/multiplayer_game_simulator.dart';
 import 'state/multiplayer_game_state.dart';
 import 'tile.dart';
+
+class ArrowPosition {
+  final int x;
+  final int y;
+
+  ArrowPosition(this.x, this.y);
+}
 
 // Reference behaviors:
 // Mouse Monopoly: https://youtu.be/eHWSrXzEV1I?t=613
@@ -91,7 +97,7 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
   void onEntityInRocket(Entity entity, int x, int y) {
     if (entity is SpecialMouse) {
       _scheduledEvent =
-          (gameSimulator as MultiplayerGameSimulator).randomGameEvent;
+          (gameSimulator as MultiplayerGameSimulator).nextGameEvent;
       _eventOrigin = (game.board.tiles[x][y] as Rocket).player;
     }
   }

@@ -34,19 +34,22 @@ class _ConnectionInfo {
   _ConnectionInfo(this.playerColor, this.nickname);
 }
 
+typedef VoidCallback = void Function();
+typedef PlaceArrow = void Function(
+    int x, int y, Direction direction, PlayerColor playerColor);
+
 class ServerSocket extends CapsuleSocket {
   final Set<int> tickets;
-  final Function(int x, int y, Direction direction, PlayerColor playerColor)
-      placeArrowCallback;
-  final Function() playerJoinCallback;
+  final PlaceArrow onPlaceArrow;
+  final VoidCallback onPlayerJoin;
 
-  HashMap<_AddressPort, _ConnectionInfo> _connections = HashMap();
-  HashMap<int, _AddressPort> _ticketsToConnection = HashMap();
+  final HashMap<_AddressPort, _ConnectionInfo> _connections = HashMap();
+  final HashMap<int, _AddressPort> _ticketsToConnection = HashMap();
 
   ServerSocket(
       {@required int port,
-      @required this.placeArrowCallback,
-      @required this.playerJoinCallback,
+      @required this.onPlaceArrow,
+      @required this.onPlayerJoin,
       this.tickets = null})
       : super(boundPort: port);
 
@@ -144,7 +147,7 @@ class ServerSocket extends CapsuleSocket {
           // Notify everyone
           _sendNicknames();
 
-          playerJoinCallback();
+          onPlayerJoin();
         }
         break;
 
@@ -158,7 +161,7 @@ class ServerSocket extends CapsuleSocket {
 
           PlaceArrowMessage placeArrowMessage = capsule.placeArrow;
 
-          placeArrowCallback(
+          onPlaceArrow(
               placeArrowMessage.x,
               placeArrowMessage.y,
               Direction.values[placeArrowMessage.direction.value],

@@ -79,7 +79,7 @@ int gameEventDurationSeconds(GameEvent event) {
       return 10;
       break;
 
-    // TODO Handle 'instantaneous events properly'
+    // TODO Handle 'instantaneous' events properly
     case GameEvent.MouseMonopoly:
     case GameEvent.CatAttack:
     case GameEvent.PlaceAgain:
@@ -100,7 +100,7 @@ int gameEventPauseDurationSeconds(GameEvent event) {
       return 3;
       break;
 
-    // TODO Handle 'instantaneous events properly'
+    // TODO Handle 'instantaneous' events properly
     case GameEvent.MouseMonopoly:
     case GameEvent.CatAttack:
     case GameEvent.EverybodyMove:

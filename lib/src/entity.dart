@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 import 'board.dart';
 import 'protocol/game_state.pb.dart' as protocol;
 
@@ -11,7 +13,7 @@ enum EntityType {
 abstract class Entity {
   BoardPosition position;
 
-  Entity({this.position});
+  Entity({@required this.position});
 
   factory Entity.fromJson(Map<String, dynamic> parsedJson) {
     return Entity.fromEntityType(EntityType.values[parsedJson['type']],
@@ -107,7 +109,7 @@ abstract class Entity {
 }
 
 class Cat extends Entity {
-  Cat({BoardPosition position}) : super(position: position);
+  Cat({@required BoardPosition position}) : super(position: position);
 
   @override
   int moveSpeed() => 2;
@@ -120,7 +122,7 @@ class Cat extends Entity {
 }
 
 class Mouse extends Entity {
-  Mouse({BoardPosition position}) : super(position: position);
+  Mouse({@required BoardPosition position}) : super(position: position);
 
   @override
   int moveSpeed() => 3;
@@ -133,7 +135,7 @@ class Mouse extends Entity {
 }
 
 class GoldenMouse extends Mouse {
-  GoldenMouse({BoardPosition position}) : super(position: position);
+  GoldenMouse({@required BoardPosition position}) : super(position: position);
 
   @override
   Map<String, dynamic> toJson() => {
@@ -143,7 +145,7 @@ class GoldenMouse extends Mouse {
 }
 
 class SpecialMouse extends Mouse {
-  SpecialMouse({BoardPosition position}) : super(position: position);
+  SpecialMouse({@required BoardPosition position}) : super(position: position);
 
   @override
   Map<String, dynamic> toJson() => {

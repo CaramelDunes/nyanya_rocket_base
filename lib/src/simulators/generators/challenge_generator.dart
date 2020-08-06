@@ -8,7 +8,7 @@ import '../../simulators/game_simulator.dart';
 mixin ChallengeGenerator on GameSimulator<GameState> {
   // We could use dart:math rng but for consistency with multiplayer,
   // use ExposedRandom.
-  ExposedRandom _rng = ExposedRandom();
+  final ExposedRandom _rng = ExposedRandom();
 
   Entity generate(Direction direction, int x, int y, GameState gameState) {
     // TODO: Maybe move condition to GameSimulator (see MultiplayerGenerator)

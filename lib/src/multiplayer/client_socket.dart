@@ -9,15 +9,19 @@ import '../protocol/game_state.pb.dart' as protocol;
 import '../protocol/messages.pb.dart';
 import 'capsule_socket.dart';
 
+typedef GameUpdateCallback = void Function(MultiplayerGameState game);
+typedef PlayerRegister = void Function(PlayerColor assignedColor);
+typedef PlayerNicknames = void Function(List<String> nicknames);
+
 class ClientSocket extends CapsuleSocket {
   final InternetAddress serverAddress;
   final int serverPort;
   final String nickname;
   final int ticket;
 
-  final Function(MultiplayerGameState game) gameStateCallback;
-  final Function(PlayerColor assignedColor) playerRegisterSuccessCallback;
-  final Function(List<String> nicknames) playerNicknamesCallback;
+  final GameUpdateCallback onGameUpdate;
+  final PlayerRegister onPlayerRegister;
+  final PlayerNicknames onPlayerNicknames;
 
   int _serverSequenceNumber = -1;
 
@@ -27,9 +31,9 @@ class ClientSocket extends CapsuleSocket {
       {@required this.serverAddress,
       @required this.serverPort,
       @required this.nickname,
-      @required this.gameStateCallback,
-      @required this.playerRegisterSuccessCallback,
-      @required this.playerNicknamesCallback,
+      @required this.onGameUpdate,
+      @required this.onPlayerRegister,
+      @required this.onPlayerNicknames,
       this.ticket = 0})
       : super();
 
@@ -79,17 +83,17 @@ class ClientSocket extends CapsuleSocket {
     _serverSequenceNumber = capsule.sequenceNumber;
 
     if (capsule.hasGameState()) {
-      gameStateCallback(
+      onGameUpdate(
           MultiplayerGameState.fromProtocolGameState(capsule.gameState));
     } else if (capsule.hasRegisterSuccess()) {
       RegisterSuccessMessage registerSuccessMessage = capsule.registerSuccess;
 
-      playerRegisterSuccessCallback(
+      onPlayerRegister(
           PlayerColor.values[registerSuccessMessage.givenColor.value]);
     } else if (capsule.hasPlayerNicknames()) {
       PlayerNicknamesMessage playerNicknamesMessage = capsule.playerNicknames;
 
-      playerNicknamesCallback(playerNicknamesMessage.nicknames);
+      onPlayerNicknames(playerNicknamesMessage.nicknames);
     }
   }
 

@@ -6,32 +6,36 @@ import '../board.dart';
 import '../state/multiplayer_game_state.dart';
 import '../multiplayer_game_ticker.dart';
 import '../tile.dart';
+import '../game_ticker.dart';
 import 'server_socket.dart';
 
-class ArrowPosition {
-  final int x;
-  final int y;
-
-  ArrowPosition(this.x, this.y);
-}
+typedef GameEndCallback = void Function(List<int> scores);
 
 class GameServer extends MultiplayerGameTicker {
   final int playerCount;
-  int _connectedCount = 0;
+  final int endNumberOfTick;
+  final GameEndCallback onGameEnd;
 
+  int _connectedCount = 0;
   ServerSocket _socket;
   bool _forceSendNextTick = false;
 
   GameServer(
       {@required Board board,
       @required this.playerCount,
+      @required Duration gameDuration,
+      this.onGameEnd,
       int port = 43210,
       Set<int> tickets})
-      : super(MultiplayerGameState()..board = board) {
+      : endNumberOfTick = (gameDuration.inMicroseconds /
+                GameTicker.updatePeriod.inMicroseconds *
+                2)
+            .round(),
+        super(MultiplayerGameState()..board = board) {
     _socket = ServerSocket(
         port: port,
-        placeArrowCallback: _onPlaceArrow,
-        playerJoinCallback: _handlePlayerJoin,
+        onPlaceArrow: _onPlaceArrow,
+        onPlayerJoin: _handlePlayerJoin,
         tickets: tickets);
   }
 
@@ -45,6 +49,11 @@ class GameServer extends MultiplayerGameTicker {
   @override
   void afterUpdate() {
     super.afterUpdate();
+
+    if (game.tickCount >= endNumberOfTick) {
+      running = false;
+      onGameEnd?.call(game.scores);
+    }
 
     if (game.tickCount % 60 == 0 || _forceSendNextTick) {
       _socket.sendGameState(game);
