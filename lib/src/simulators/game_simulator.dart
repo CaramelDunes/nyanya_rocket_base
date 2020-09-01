@@ -128,7 +128,7 @@ abstract class GameSimulator<StateType extends GameState> {
 
   Entity generate(Direction direction, int x, int y, StateType gameState);
 
-  Entity _applyTileEffect(Entity e, List<BoardPosition> pendingArrowDeletions,
+  Entity applyTileEffect(Entity e, List<BoardPosition> pendingArrowDeletions,
       StateType gameState) {
     assert(e.position.step == BoardPosition.centerStep);
 
@@ -209,14 +209,13 @@ abstract class GameSimulator<StateType extends GameState> {
     List<BoardPosition> pendingArrowDeletions = List();
 
     gameState.mice.forEach((Mouse e) {
+      e.position = _moveTick(e.position, e.moveSpeed(), gameState);
+
       if (e.position.step == BoardPosition.centerStep) {
-        e = _applyTileEffect(e, pendingArrowDeletions, gameState);
+        e = applyTileEffect(e, pendingArrowDeletions, gameState);
       }
 
-      if (e != null) {
-        e.position = _moveTick(e.position, e.moveSpeed(), gameState);
-        newMice.add(e);
-      }
+      if (e != null) newMice.add(e);
     });
 
     gameState.mice = newMice;
@@ -224,14 +223,13 @@ abstract class GameSimulator<StateType extends GameState> {
     List<Cat> newCats = List();
 
     gameState.cats.forEach((Cat e) {
+      e.position = _moveTick(e.position, e.moveSpeed(), gameState);
+
       if (e.position.step == BoardPosition.centerStep) {
-        e = _applyTileEffect(e, pendingArrowDeletions, gameState);
+        e = applyTileEffect(e, pendingArrowDeletions, gameState);
       }
 
-      if (e != null) {
-        e.position = _moveTick(e.position, e.moveSpeed(), gameState);
-        newCats.add(e);
-      }
+      if (e != null) newCats.add(e);
     });
 
     gameState.cats = newCats;
