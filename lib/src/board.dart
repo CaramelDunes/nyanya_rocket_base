@@ -41,6 +41,8 @@ class BoardPosition {
   BoardPosition withDirection(Direction newDirection) =>
       BoardPosition(x, y, newDirection, step);
 
+  BoardPosition copy() => BoardPosition(x, y, direction, step);
+
   Map<String, dynamic> toJson() =>
       {'x': x, 'y': y, 'direction': direction.index};
 }

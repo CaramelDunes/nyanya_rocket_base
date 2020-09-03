@@ -3,11 +3,11 @@ import '../entity.dart';
 import '../tile.dart';
 
 class GameState {
+  int tickCount = 0;
   List<int> scores = List.filled(4, 0, growable: false);
   Board board = Board();
   List<Cat> cats = List();
   List<Mouse> mice = List();
-  int tickCount = 0;
 
   GameState();
 
@@ -23,6 +23,15 @@ class GameState {
         mice.add(e);
       }
     });
+  }
+
+  GameState copy() {
+    return GameState()
+      ..tickCount = tickCount
+      ..scores = List.of(scores)
+      ..board = Board.copy(board)
+      ..mice = List.of(mice.map((mouse) => mouse.copy()))
+      ..cats = List.of(cats.map((cat) => cat.copy()));
   }
 
   Map<String, dynamic> toJson() => {

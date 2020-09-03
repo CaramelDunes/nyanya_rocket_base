@@ -111,6 +111,8 @@ abstract class Entity {
 class Cat extends Entity {
   Cat({@required BoardPosition position}) : super(position: position);
 
+  Cat copy() => Cat(position: position.copy());
+
   @override
   int moveSpeed() => 2;
 
@@ -123,6 +125,8 @@ class Cat extends Entity {
 
 class Mouse extends Entity {
   Mouse({@required BoardPosition position}) : super(position: position);
+
+  Mouse copy() => Mouse(position: position.copy());
 
   @override
   int moveSpeed() => 3;
@@ -137,6 +141,8 @@ class Mouse extends Entity {
 class GoldenMouse extends Mouse {
   GoldenMouse({@required BoardPosition position}) : super(position: position);
 
+  GoldenMouse copy() => GoldenMouse(position: position.copy());
+
   @override
   Map<String, dynamic> toJson() => {
         'type': EntityType.GoldenMouse.index,
@@ -146,6 +152,8 @@ class GoldenMouse extends Mouse {
 
 class SpecialMouse extends Mouse {
   SpecialMouse({@required BoardPosition position}) : super(position: position);
+
+  SpecialMouse copy() => SpecialMouse(position: position.copy());
 
   @override
   Map<String, dynamic> toJson() => {
