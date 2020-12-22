@@ -22,19 +22,19 @@ void main() {
     final Entity entity = Entity.fromJson(
         jsonDecode('{"type":0,"position":{"x":0,"y":0,"direction":0}}'));
     expect(entity.runtimeType, Cat);
-    expect((entity as Cat).position.x, 0);
-    expect((entity as Cat).position.y, 0);
-    expect((entity as Cat).position.step, BoardPosition.centerStep);
-    expect((entity as Cat).position.direction, Direction.Right);
+    expect((entity).position.x, 0);
+    expect((entity).position.y, 0);
+    expect((entity).position.step, BoardPosition.centerStep);
+    expect((entity).position.direction, Direction.Right);
   });
 
   test('Entity.fromJson() on a Mouse', () {
     final Entity entity = Entity.fromJson(
         jsonDecode('{"type":1,"position":{"x":0,"y":0,"direction":0}}'));
     expect(entity.runtimeType, Mouse);
-    expect((entity as Mouse).position.x, 0);
-    expect((entity as Mouse).position.y, 0);
-    expect((entity as Mouse).position.step, BoardPosition.centerStep);
-    expect((entity as Mouse).position.direction, Direction.Right);
+    expect((entity).position.x, 0);
+    expect((entity).position.y, 0);
+    expect((entity).position.step, BoardPosition.centerStep);
+    expect((entity).position.direction, Direction.Right);
   });
 }

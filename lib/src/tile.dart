@@ -1,4 +1,3 @@
-import 'package:meta/meta.dart';
 import 'board.dart';
 import 'protocol/game_state.pb.dart' as protocol;
 
@@ -41,64 +40,47 @@ abstract class Tile {
     switch (TileType.values[parsedJson['type']]) {
       case TileType.Empty:
         return Empty();
-        break;
 
       case TileType.Arrow:
         return Arrow.fromJson(parsedJson);
-        break;
 
       case TileType.Pit:
         return Pit();
-        break;
 
       case TileType.Rocket:
         return Rocket.fromJson(parsedJson);
-        break;
 
       case TileType.Generator:
         return Generator.fromJson(parsedJson);
-        break;
     }
-
-    return Empty();
   }
 
   factory Tile.fromProtocolTile(protocol.Tile tile) {
-    Tile t;
-
     switch (tile.type) {
       case protocol.TileType.EMPTY:
-        t = Empty();
-        break;
+        return Empty();
 
       case protocol.TileType.PIT:
-        t = const Pit();
-        break;
+        return const Pit();
 
       case protocol.TileType.ROCKET:
-        t = Rocket(player: PlayerColor.values[tile.owner.value]);
-        break;
+        return Rocket(player: PlayerColor.values[tile.owner.value]);
 
       case protocol.TileType.ARROW:
-        t = Arrow(
+        return Arrow(
             player: PlayerColor.values[tile.owner.value],
             direction: Direction.values[tile.direction.value],
             halfTurnPower: tile.damagedOrDeparted
                 ? ArrowHalfTurnPower.OneCat
                 : ArrowHalfTurnPower.TwoCats,
             expiration: tile.expiration);
-        break;
 
       case protocol.TileType.GENERATOR:
-        t = Generator(direction: Direction.values[tile.direction.value]);
-        break;
-
-      default:
-        print('Got unknown tile type from network!');
-        break;
+        return Generator(direction: Direction.values[tile.direction.value]);
     }
 
-    return t;
+    // TODO Better handling.
+    throw Exception('Got unknown tile type from network!');
   }
 
   Map<String, dynamic> toJson();
@@ -138,14 +120,14 @@ class Arrow extends Tile {
   final int expiration;
 
   const Arrow(
-      {@required this.player,
-      @required this.direction,
+      {required this.player,
+      required this.direction,
       this.halfTurnPower = ArrowHalfTurnPower.TwoCats,
       this.expiration = defaultExpiration});
 
   const Arrow.notExpiring({
-    @required this.player,
-    @required this.direction,
+    required this.player,
+    required this.direction,
     this.halfTurnPower = ArrowHalfTurnPower.TwoCats,
   }) : expiration = 600 * 1000000;
 
@@ -218,9 +200,9 @@ class Rocket extends Tile {
   final PlayerColor player;
   final bool departed;
 
-  const Rocket({@required this.player, this.departed = false});
+  const Rocket({required this.player, this.departed = false});
 
-  const Rocket.departed({@required this.player}) : departed = true;
+  const Rocket.departed({required this.player}) : departed = true;
 
   @override
   Map<String, dynamic> toJson() => {
@@ -249,7 +231,7 @@ class Rocket extends Tile {
 class Generator extends Tile {
   final Direction direction;
 
-  const Generator({@required this.direction});
+  const Generator({required this.direction});
 
   @override
   Map<String, dynamic> toJson() => {

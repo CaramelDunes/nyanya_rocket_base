@@ -1,8 +1,6 @@
 import 'dart:collection';
 import 'dart:io';
 
-import 'package:meta/meta.dart';
-
 import '../board.dart';
 import '../state/multiplayer_game_state.dart';
 import '../tile.dart';
@@ -39,7 +37,7 @@ typedef PlaceArrow = void Function(
     int x, int y, Direction direction, PlayerColor playerColor);
 
 class ServerSocket extends CapsuleSocket {
-  final Set<int> tickets;
+  final Set<int>? tickets;
   final PlaceArrow onPlaceArrow;
   final VoidCallback onPlayerJoin;
 
@@ -47,10 +45,10 @@ class ServerSocket extends CapsuleSocket {
   final HashMap<int, _AddressPort> _ticketsToConnection = HashMap();
 
   ServerSocket(
-      {@required int port,
-      @required this.onPlaceArrow,
-      @required this.onPlayerJoin,
-      this.tickets = null})
+      {required int port,
+      required this.onPlaceArrow,
+      required this.onPlayerJoin,
+      this.tickets})
       : super(boundPort: port);
 
   void sendGameState(MultiplayerGameState game) {
@@ -89,8 +87,8 @@ class ServerSocket extends CapsuleSocket {
 
           // If player has a valid ticket.
           if (_ticketsToConnection.containsKey(ticket)) {
-            _AddressPort old = _ticketsToConnection[ticket];
-            _ConnectionInfo playerConnectionInfo = _connections[old];
+            _AddressPort old = _ticketsToConnection[ticket]!;
+            _ConnectionInfo? playerConnectionInfo = _connections[old];
 
             // Discard if ping message is outdated or connection info
             // could not be found (shouldn't happen here).
@@ -103,7 +101,7 @@ class ServerSocket extends CapsuleSocket {
 
             // Update player IP address and port.
             _ticketsToConnection[ticket] = key;
-            _connections[key] = _connections.remove(old);
+            _connections[key] = _connections.remove(old)!; // TODO Remove !
           }
         }
         break;
@@ -120,9 +118,9 @@ class ServerSocket extends CapsuleSocket {
           // If tickets have been specified, they are required
           if (tickets != null) {
             if (registerMessage.hasTicket() &&
-                tickets.contains(registerMessage.ticket)) {
+                tickets!.contains(registerMessage.ticket)) {
               // Burn ticket
-              tickets.remove(registerMessage.ticket);
+              tickets!.remove(registerMessage.ticket);
               print('Ticket ${registerMessage.ticket} burned.');
             } else {
               print('Wrong ticket received!');
@@ -139,7 +137,7 @@ class ServerSocket extends CapsuleSocket {
 
           RegisterSuccessMessage reply = RegisterSuccessMessage()
             ..givenColor =
-                _connections[key].playerColor.toProtocolPlayerColor();
+                _connections[key]!.playerColor.toProtocolPlayerColor();
 
           Capsule response = Capsule()..registerSuccess = reply;
           sendCapsule(response, key.address, key.port, true);
@@ -152,7 +150,7 @@ class ServerSocket extends CapsuleSocket {
         break;
 
       case Capsule_Payload.placeArrow:
-        _ConnectionInfo playerConnectionInfo = _connections[key];
+        _ConnectionInfo? playerConnectionInfo = _connections[key];
 
         if (playerConnectionInfo != null &&
             CapsuleSocket.isSequenceNumberGreaterThan(

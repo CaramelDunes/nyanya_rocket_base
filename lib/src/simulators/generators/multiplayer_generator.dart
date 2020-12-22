@@ -5,7 +5,7 @@ import '../../simulators/game_simulator.dart';
 
 mixin MultiplayerGenerator on GameSimulator<MultiplayerGameState> {
   @override
-  Entity generate(
+  Entity? generate(
       Direction direction, int x, int y, MultiplayerGameState gameState) {
     double firstRandomDouble = gameState.rng.nextDouble();
     double secondRandomDouble = gameState.rng.nextDouble();

@@ -10,7 +10,7 @@ mixin ChallengeGenerator on GameSimulator<GameState> {
   // use ExposedRandom.
   final ExposedRandom _rng = ExposedRandom();
 
-  Entity generate(Direction direction, int x, int y, GameState gameState) {
+  Entity? generate(Direction direction, int x, int y, GameState gameState) {
     // TODO: Maybe move condition to GameSimulator (see MultiplayerGenerator)
     if (gameState.mice.length >= 100) {
       return null;

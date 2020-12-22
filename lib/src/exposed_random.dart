@@ -4,11 +4,11 @@ import 'package:fixnum/fixnum.dart';
 
 // Dart's Random with exposed state for multiplayer deterministic simulation.
 class ExposedRandom implements Random {
-  int _state; // uint64_t
+  late int _state; // uint64_t
 
   // https://github.com/dart-lang/sdk/blob/master/sdk/lib/_internal/vm/lib/math_patch.dart
   // https://github.com/dart-lang/sdk/blob/master/runtime/vm/random.cc#L35
-  ExposedRandom([int seed]) {
+  ExposedRandom([int? seed]) {
     if (seed == null) {
       seed = DateTime.now().microsecondsSinceEpoch;
     }

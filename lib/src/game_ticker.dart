@@ -16,7 +16,7 @@ class GameTicker<T extends GameState> {
   T _game;
   final GameSimulator gameSimulator;
 
-  Timer _updateTimer;
+  late Timer _updateTimer;
   DateTime _previousClock = DateTime.now();
   Duration _timeAccumulator = Duration.zero;
 

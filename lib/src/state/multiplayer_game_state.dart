@@ -31,11 +31,11 @@ class MultiplayerGameState extends GameState {
     board = Board.fromProtocolBoard(gameState.board);
 
     gameState.cats.forEach((protocol.Entity entity) {
-      cats.add(Entity.fromProtocolEntity(entity));
+      cats.add(Entity.fromProtocolEntity(entity) as Cat); // FIXME
     });
 
     gameState.mice.forEach((protocol.Entity entity) {
-      mice.add(Entity.fromProtocolEntity(entity));
+      mice.add(Entity.fromProtocolEntity(entity) as Mouse); //FIXME
     });
 
     scores = gameState.scores;
@@ -77,7 +77,6 @@ int gameEventDurationSeconds(GameEvent event) {
     case GameEvent.SpeedUp:
     case GameEvent.SlowDown:
       return 10;
-      break;
 
     // TODO Handle 'instantaneous' events properly
     case GameEvent.MouseMonopoly:
@@ -87,7 +86,6 @@ int gameEventDurationSeconds(GameEvent event) {
     case GameEvent.None:
     default:
       return 0;
-      break;
   }
 }
 
@@ -98,22 +96,18 @@ int gameEventPauseDurationSeconds(GameEvent event) {
     case GameEvent.SpeedUp:
     case GameEvent.SlowDown:
       return 3;
-      break;
 
     // TODO Handle 'instantaneous' events properly
     case GameEvent.MouseMonopoly:
     case GameEvent.CatAttack:
     case GameEvent.EverybodyMove:
       return 3 + 2;
-      break;
 
     case GameEvent.PlaceAgain:
       return 3 + 3;
-      break;
 
     case GameEvent.None:
     default:
       return 0;
-      break;
   }
 }
