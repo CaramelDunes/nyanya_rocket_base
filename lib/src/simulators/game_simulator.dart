@@ -209,10 +209,9 @@ abstract class GameSimulator<StateType extends GameState> {
       Mouse? e2 = e;
       if (e.position.step == BoardPosition.centerStep) {
         e2 = applyTileEffect(e, pendingArrowDeletions, gameState)
-            as Mouse; // FIXME
+            as Mouse?; // FIXME
       }
-
-      if (e2 != null) newMice.add(e);
+      if (e2 != null) newMice.add(e2);
     });
 
     gameState.mice = newMice;
@@ -224,10 +223,11 @@ abstract class GameSimulator<StateType extends GameState> {
 
       Cat? e2 = e;
       if (e.position.step == BoardPosition.centerStep) {
-        e2 = applyTileEffect(e, pendingArrowDeletions, gameState) as Cat; // FIXME
+        e2 = applyTileEffect(e, pendingArrowDeletions, gameState)
+            as Cat?; // FIXME
       }
 
-      if (e2 != null) newCats.add(e);
+      if (e2 != null) newCats.add(e2);
     });
 
     gameState.cats = newCats;
