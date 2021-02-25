@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:nyanya_rocket_base/nyanya_rocket_base.dart';
 
 import '../../state/game_state.dart';
@@ -6,9 +8,9 @@ import '../../entity.dart';
 import '../../simulators/game_simulator.dart';
 
 mixin ChallengeGenerator on GameSimulator<GameState> {
-  // We could use dart:math rng but for consistency with multiplayer,
-  // use ExposedRandom.
-  final ExposedRandom _rng = ExposedRandom();
+  // We could use ExposedRandom for consistency with multiplayer but use Random
+  // web support.
+  final Random _rng = Random();
 
   Entity? generate(Direction direction, int x, int y, GameState gameState) {
     // TODO: Maybe move condition to GameSimulator (see MultiplayerGenerator)
