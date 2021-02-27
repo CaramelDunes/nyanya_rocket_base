@@ -9,28 +9,16 @@ enum TileType {
   Generator,
 }
 
-class PlayerColor {
-  final int index;
+enum PlayerColor {
+  Blue,
+  Red,
+  Green,
+  Yellow,
+}
 
-  const PlayerColor._internal(this.index);
-
-  @override
-  String toString() => 'PlayerColor.$index';
-
+extension ProtocolConversion on PlayerColor {
   protocol.PlayerColor toProtocolPlayerColor() =>
-      protocol.PlayerColor.values[index];
-
-  static const Blue = const PlayerColor._internal(0);
-  static const Red = const PlayerColor._internal(1);
-  static const Green = const PlayerColor._internal(2);
-  static const Yellow = const PlayerColor._internal(3);
-
-  static const List<PlayerColor> values = const <PlayerColor>[
-    Blue,
-    Red,
-    Green,
-    Yellow,
-  ];
+      protocol.PlayerColor.values[this.index];
 }
 
 abstract class Tile {

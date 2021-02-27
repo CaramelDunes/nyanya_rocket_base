@@ -9,7 +9,7 @@ import '../../simulators/game_simulator.dart';
 
 mixin ChallengeGenerator on GameSimulator<GameState> {
   // We could use ExposedRandom for consistency with multiplayer but use Random
-  // web support.
+  // for web support.
   final Random _rng = Random();
 
   Entity? generate(Direction direction, int x, int y, GameState gameState) {
