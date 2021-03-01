@@ -127,9 +127,8 @@ abstract class GameSimulator<StateType extends GameState> {
 
   Entity? generate(Direction direction, int x, int y, StateType gameState);
 
-  // TODO Generify
-  Entity? applyTileEffect(Entity e, List<BoardPosition> pendingArrowDeletions,
-      StateType gameState) {
+  T? applyTileEffect<T extends Entity>(
+      T e, List<BoardPosition> pendingArrowDeletions, StateType gameState) {
     assert(e.position.step == BoardPosition.centerStep);
 
     // Warp tile
@@ -203,31 +202,26 @@ abstract class GameSimulator<StateType extends GameState> {
     List<Mouse> newMice = [];
     List<BoardPosition> pendingArrowDeletions = [];
 
-    gameState.mice.forEach((Mouse e) {
-      e.position = _moveTick(e.position, e.moveSpeed(), gameState);
+    gameState.mice.forEach((Mouse? mouse) {
+      mouse!.position = _moveTick(mouse.position, mouse.moveSpeed(), gameState);
 
-      Mouse? e2 = e;
-      if (e.position.step == BoardPosition.centerStep) {
-        e2 = applyTileEffect(e, pendingArrowDeletions, gameState)
-            as Mouse?; // FIXME
+      if (mouse.position.step == BoardPosition.centerStep) {
+        mouse = applyTileEffect(mouse, pendingArrowDeletions, gameState);
       }
-      if (e2 != null) newMice.add(e2);
+      if (mouse != null) newMice.add(mouse);
     });
 
     gameState.mice = newMice;
 
     List<Cat> newCats = [];
 
-    gameState.cats.forEach((Cat e) {
-      e.position = _moveTick(e.position, e.moveSpeed(), gameState);
+    gameState.cats.forEach((Cat? cat) {
+      cat!.position = _moveTick(cat.position, cat.moveSpeed(), gameState);
 
-      Cat? e2 = e;
-      if (e.position.step == BoardPosition.centerStep) {
-        e2 = applyTileEffect(e, pendingArrowDeletions, gameState)
-            as Cat?; // FIXME
+      if (cat.position.step == BoardPosition.centerStep) {
+        cat = applyTileEffect(cat, pendingArrowDeletions, gameState);
       }
-
-      if (e2 != null) newCats.add(e2);
+      if (cat != null) newCats.add(cat);
     });
 
     gameState.cats = newCats;
