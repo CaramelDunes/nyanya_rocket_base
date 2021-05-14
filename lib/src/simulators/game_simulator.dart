@@ -16,10 +16,10 @@ typedef ArrowExpiredCallback = void Function(Arrow arrow, int x, int y);
 abstract class GameSimulator<StateType extends GameState> {
   GameSpeed speed = GameSpeed.Normal;
 
-  MouseEatenCallback onMouseEaten;
-  EntityInPitCallback onEntityInPit;
-  EntityInRocketCallback onEntityInRocket;
-  ArrowExpiredCallback onArrowExpiry;
+  MouseEatenCallback? onMouseEaten;
+  EntityInPitCallback? onEntityInPit;
+  EntityInRocketCallback? onEntityInRocket;
+  ArrowExpiredCallback? onArrowExpiry;
 
   void update(StateType gameState) {
     tick(gameState);
@@ -62,12 +62,12 @@ abstract class GameSimulator<StateType extends GameState> {
   void _tickEntities(StateType gameState) {
     _moveEntities(gameState);
 
-    List<Mouse> newMice = List();
+    List<Mouse> newMice = [];
 
     gameState.mice.forEach((Mouse mouse) {
       bool dead = false;
       for (Cat cat in gameState.cats) {
-        if (_colliding(mouse, cat)) {
+        if (colliding(mouse.position, cat.position)) {
           dead = true;
           onMouseEaten?.call(mouse, cat);
           break;
@@ -101,35 +101,34 @@ abstract class GameSimulator<StateType extends GameState> {
         }
 
         return arrow.withExpiration(arrow.expiration - 1);
-        break;
 
       case Generator:
         Generator generator = tile as Generator;
-        Entity e = generate(generator.direction, x, y, gameState);
+        Entity? e = generate(generator.direction, x, y, gameState);
 
         if (e != null) {
           if (e is Cat) {
             gameState.cats.add(e);
-          } else {
+          } else if (e is Mouse) {
             gameState.mice.add(e);
+          } else {
+            throw Exception(); // FIXME
           }
         }
         return tile;
-        break;
 
       case Empty:
       case Pit:
       case Rocket:
       default:
         return tile;
-        break;
     }
   }
 
-  Entity generate(Direction direction, int x, int y, StateType gameState);
+  Entity? generate(Direction direction, int x, int y, StateType gameState);
 
-  Entity applyTileEffect(Entity e, List<BoardPosition> pendingArrowDeletions,
-      StateType gameState) {
+  T? applyTileEffect<T extends Entity>(
+      T e, List<BoardPosition> pendingArrowDeletions, StateType gameState) {
     assert(e.position.step == BoardPosition.centerStep);
 
     // Warp tile
@@ -146,7 +145,6 @@ abstract class GameSimulator<StateType extends GameState> {
       case Pit:
         onEntityInPit?.call(e, e.position.x, e.position.y);
         return null;
-        break;
 
       case Rocket:
         Rocket rocket = tile as Rocket;
@@ -167,7 +165,6 @@ abstract class GameSimulator<StateType extends GameState> {
           onEntityInPit?.call(e, e.position.x, e.position.y);
         }
         return null;
-        break;
 
       case Arrow:
         Arrow arrow = tile as Arrow;
@@ -178,7 +175,6 @@ abstract class GameSimulator<StateType extends GameState> {
           switch (arrow.halfTurnPower) {
             case ArrowHalfTurnPower.ZeroCat:
               return e;
-              break;
 
             case ArrowHalfTurnPower.OneCat:
               gameState.board.tiles[e.position.x][e.position.y] =
@@ -196,40 +192,36 @@ abstract class GameSimulator<StateType extends GameState> {
 
         e.position = e.position.withDirection(arrow.direction);
         return e;
-        break;
 
       default:
         return e;
-        break;
     }
   }
 
   void _moveEntities(StateType gameState) {
-    List<Mouse> newMice = List();
-    List<BoardPosition> pendingArrowDeletions = List();
+    List<Mouse> newMice = [];
+    List<BoardPosition> pendingArrowDeletions = [];
 
-    gameState.mice.forEach((Mouse e) {
-      e.position = _moveTick(e.position, e.moveSpeed(), gameState);
+    gameState.mice.forEach((Mouse? mouse) {
+      mouse!.position = _moveTick(mouse.position, mouse.moveSpeed(), gameState);
 
-      if (e.position.step == BoardPosition.centerStep) {
-        e = applyTileEffect(e, pendingArrowDeletions, gameState);
+      if (mouse.position.step == BoardPosition.centerStep) {
+        mouse = applyTileEffect(mouse, pendingArrowDeletions, gameState);
       }
-
-      if (e != null) newMice.add(e);
+      if (mouse != null) newMice.add(mouse);
     });
 
     gameState.mice = newMice;
 
-    List<Cat> newCats = List();
+    List<Cat> newCats = [];
 
-    gameState.cats.forEach((Cat e) {
-      e.position = _moveTick(e.position, e.moveSpeed(), gameState);
+    gameState.cats.forEach((Cat? cat) {
+      cat!.position = _moveTick(cat.position, cat.moveSpeed(), gameState);
 
-      if (e.position.step == BoardPosition.centerStep) {
-        e = applyTileEffect(e, pendingArrowDeletions, gameState);
+      if (cat.position.step == BoardPosition.centerStep) {
+        cat = applyTileEffect(cat, pendingArrowDeletions, gameState);
       }
-
-      if (e != null) newCats.add(e);
+      if (cat != null) newCats.add(cat);
     });
 
     gameState.cats = newCats;
@@ -313,17 +305,17 @@ abstract class GameSimulator<StateType extends GameState> {
     return BoardPosition(x, y, front, step);
   }
 
-  double _xBlend(Entity entity) {
-    double xBlend = entity.position.x.toDouble();
+  static double _xBlend(BoardPosition position) {
+    double xBlend = position.x.toDouble();
 
-    switch (entity.position.direction) {
+    switch (position.direction) {
       case Direction.Right:
-        xBlend += entity.position.step / BoardPosition.maxStep;
+        xBlend += position.step / BoardPosition.maxStep;
         break;
 
       case Direction.Left:
-        xBlend += (BoardPosition.maxStep - entity.position.step) /
-            BoardPosition.maxStep;
+        xBlend +=
+            (BoardPosition.maxStep - position.step) / BoardPosition.maxStep;
         break;
 
       default:
@@ -336,17 +328,17 @@ abstract class GameSimulator<StateType extends GameState> {
     return xBlend;
   }
 
-  double _yBlend(Entity entity) {
-    double yBlend = entity.position.y.toDouble();
+  static double _yBlend(BoardPosition position) {
+    double yBlend = position.y.toDouble();
 
-    switch (entity.position.direction) {
+    switch (position.direction) {
       case Direction.Up:
-        yBlend += (BoardPosition.maxStep - entity.position.step) /
-            BoardPosition.maxStep;
+        yBlend +=
+            (BoardPosition.maxStep - position.step) / BoardPosition.maxStep;
         break;
 
       case Direction.Down:
-        yBlend += entity.position.step / BoardPosition.maxStep;
+        yBlend += position.step / BoardPosition.maxStep;
         break;
 
       default:
@@ -359,14 +351,14 @@ abstract class GameSimulator<StateType extends GameState> {
     return yBlend;
   }
 
-  bool _colliding(Entity a, Entity b) {
+  static bool colliding(BoardPosition a, BoardPosition b) {
     double axBlend = _xBlend(a);
     double ayBlend = _yBlend(a);
 
     double bxBlend = _xBlend(b);
     double byBlend = _yBlend(b);
 
-    double dist = pow(axBlend - bxBlend, 2) + pow(ayBlend - byBlend, 2);
+    num dist = pow(axBlend - bxBlend, 2) + pow(ayBlend - byBlend, 2);
 
     if (dist <= 1 / 9) {
       return true;

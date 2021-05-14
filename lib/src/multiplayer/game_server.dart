@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:meta/meta.dart';
-
 import '../board.dart';
 import '../state/multiplayer_game_state.dart';
 import '../multiplayer_game_ticker.dart';
@@ -14,19 +12,19 @@ typedef GameEndCallback = void Function(List<int> scores);
 class GameServer extends MultiplayerGameTicker {
   final int playerCount;
   final int endNumberOfTick;
-  final GameEndCallback onGameEnd;
+  final GameEndCallback? onGameEnd;
 
   int _connectedCount = 0;
-  ServerSocket _socket;
+  late ServerSocket _socket;
   bool _forceSendNextTick = false;
 
   GameServer(
-      {@required Board board,
-      @required this.playerCount,
-      @required Duration gameDuration,
+      {required Board board,
+      required this.playerCount,
+      required Duration gameDuration,
       this.onGameEnd,
       int port = 43210,
-      Set<int> tickets})
+      Set<int>? tickets})
       : endNumberOfTick = (gameDuration.inMicroseconds /
                 GameTicker.updatePeriod.inMicroseconds *
                 2)

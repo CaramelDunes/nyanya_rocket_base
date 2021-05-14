@@ -203,23 +203,18 @@ class Board {
     switch (direction) {
       case Direction.Right:
         return hasRightWall(x, y);
-        break;
 
       case Direction.Up:
         return hasUpWall(x, y);
-        break;
 
       case Direction.Left:
         return hasLeftWall(x, y);
-        break;
 
       case Direction.Down:
         return hasDownWall(x, y);
-        break;
 
       default:
         return false;
-        break;
     }
   }
 
@@ -250,7 +245,7 @@ class Board {
   bool operator ==(other) {
     if (super == other) return true;
 
-    if (runtimeType != other.runtimeType) return false;
+    if (other is! Board) return false;
 
     for (int i = 0; i < width; i++) {
       for (int j = 0; j < height; j++) {

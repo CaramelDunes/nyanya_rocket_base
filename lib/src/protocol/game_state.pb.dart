@@ -2,8 +2,8 @@
 //  Generated code. Do not modify.
 //  source: game_state.proto
 //
-// @dart = 2.3
-// ignore_for_file: camel_case_types,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type
+// @dart = 2.12
+// ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields
 
 import 'dart:core' as $core;
 
@@ -15,12 +15,12 @@ import 'game_state.pbenum.dart';
 export 'game_state.pbenum.dart';
 
 class Tile extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo('Tile', createEmptyInstance: create)
-    ..e<TileType>(1, 'type', $pb.PbFieldType.OE, defaultOrMaker: TileType.EMPTY, valueOf: TileType.valueOf, enumValues: TileType.values)
-    ..e<Direction>(2, 'direction', $pb.PbFieldType.OE, defaultOrMaker: Direction.RIGHT, valueOf: Direction.valueOf, enumValues: Direction.values)
-    ..e<PlayerColor>(3, 'owner', $pb.PbFieldType.OE, defaultOrMaker: PlayerColor.BLUE, valueOf: PlayerColor.valueOf, enumValues: PlayerColor.values)
-    ..aOB(4, 'damagedOrDeparted', protoName: 'damagedOrDeparted')
-    ..a<$core.int>(5, 'expiration', $pb.PbFieldType.OU3)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Tile', createEmptyInstance: create)
+    ..e<TileType>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: TileType.EMPTY, valueOf: TileType.valueOf, enumValues: TileType.values)
+    ..e<Direction>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'direction', $pb.PbFieldType.OE, defaultOrMaker: Direction.RIGHT, valueOf: Direction.valueOf, enumValues: Direction.values)
+    ..e<PlayerColor>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'owner', $pb.PbFieldType.OE, defaultOrMaker: PlayerColor.BLUE, valueOf: PlayerColor.valueOf, enumValues: PlayerColor.values)
+    ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'damagedOrDeparted', protoName: 'damagedOrDeparted')
+    ..a<$core.int>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'expiration', $pb.PbFieldType.OU3)
     ..hasRequiredFields = false
   ;
 
@@ -28,8 +28,16 @@ class Tile extends $pb.GeneratedMessage {
   factory Tile() => create();
   factory Tile.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory Tile.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   Tile clone() => Tile()..mergeFromMessage(this);
-  Tile copyWith(void Function(Tile) updates) => super.copyWith((message) => updates(message as Tile));
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Tile copyWith(void Function(Tile) updates) => super.copyWith((message) => updates(message as Tile)) as Tile; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static Tile create() => Tile._();
@@ -37,7 +45,7 @@ class Tile extends $pb.GeneratedMessage {
   static $pb.PbList<Tile> createRepeated() => $pb.PbList<Tile>();
   @$core.pragma('dart2js:noInline')
   static Tile getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Tile>(create);
-  static Tile _defaultInstance;
+  static Tile? _defaultInstance;
 
   @$pb.TagNumber(1)
   TileType get type => $_getN(0);
@@ -86,9 +94,9 @@ class Tile extends $pb.GeneratedMessage {
 }
 
 class Board extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo('Board', createEmptyInstance: create)
-    ..pc<Wall>(1, 'walls', $pb.PbFieldType.PE, valueOf: Wall.valueOf, enumValues: Wall.values)
-    ..pc<Tile>(2, 'tiles', $pb.PbFieldType.PM, subBuilder: Tile.create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Board', createEmptyInstance: create)
+    ..pc<Wall>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'walls', $pb.PbFieldType.PE, valueOf: Wall.valueOf, enumValues: Wall.values)
+    ..pc<Tile>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tiles', $pb.PbFieldType.PM, subBuilder: Tile.create)
     ..hasRequiredFields = false
   ;
 
@@ -96,8 +104,16 @@ class Board extends $pb.GeneratedMessage {
   factory Board() => create();
   factory Board.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory Board.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   Board clone() => Board()..mergeFromMessage(this);
-  Board copyWith(void Function(Board) updates) => super.copyWith((message) => updates(message as Board));
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Board copyWith(void Function(Board) updates) => super.copyWith((message) => updates(message as Board)) as Board; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static Board create() => Board._();
@@ -105,7 +121,7 @@ class Board extends $pb.GeneratedMessage {
   static $pb.PbList<Board> createRepeated() => $pb.PbList<Board>();
   @$core.pragma('dart2js:noInline')
   static Board getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Board>(create);
-  static Board _defaultInstance;
+  static Board? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.List<Wall> get walls => $_getList(0);
@@ -115,12 +131,12 @@ class Board extends $pb.GeneratedMessage {
 }
 
 class Entity extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo('Entity', createEmptyInstance: create)
-    ..e<EntityType>(1, 'type', $pb.PbFieldType.OE, defaultOrMaker: EntityType.CAT, valueOf: EntityType.valueOf, enumValues: EntityType.values)
-    ..a<$core.int>(2, 'x', $pb.PbFieldType.OU3)
-    ..a<$core.int>(3, 'y', $pb.PbFieldType.OU3)
-    ..a<$core.int>(4, 'step', $pb.PbFieldType.OU3)
-    ..e<Direction>(5, 'direction', $pb.PbFieldType.OE, defaultOrMaker: Direction.RIGHT, valueOf: Direction.valueOf, enumValues: Direction.values)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Entity', createEmptyInstance: create)
+    ..e<EntityType>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: EntityType.CAT, valueOf: EntityType.valueOf, enumValues: EntityType.values)
+    ..a<$core.int>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'x', $pb.PbFieldType.OU3)
+    ..a<$core.int>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'y', $pb.PbFieldType.OU3)
+    ..a<$core.int>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'step', $pb.PbFieldType.OU3)
+    ..e<Direction>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'direction', $pb.PbFieldType.OE, defaultOrMaker: Direction.RIGHT, valueOf: Direction.valueOf, enumValues: Direction.values)
     ..hasRequiredFields = false
   ;
 
@@ -128,8 +144,16 @@ class Entity extends $pb.GeneratedMessage {
   factory Entity() => create();
   factory Entity.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory Entity.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   Entity clone() => Entity()..mergeFromMessage(this);
-  Entity copyWith(void Function(Entity) updates) => super.copyWith((message) => updates(message as Entity));
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Entity copyWith(void Function(Entity) updates) => super.copyWith((message) => updates(message as Entity)) as Entity; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static Entity create() => Entity._();
@@ -137,7 +161,7 @@ class Entity extends $pb.GeneratedMessage {
   static $pb.PbList<Entity> createRepeated() => $pb.PbList<Entity>();
   @$core.pragma('dart2js:noInline')
   static Entity getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Entity>(create);
-  static Entity _defaultInstance;
+  static Entity? _defaultInstance;
 
   @$pb.TagNumber(1)
   EntityType get type => $_getN(0);
@@ -186,16 +210,16 @@ class Entity extends $pb.GeneratedMessage {
 }
 
 class GameState extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo('GameState', createEmptyInstance: create)
-    ..a<$core.int>(1, 'tickCount', $pb.PbFieldType.OU3, protoName: 'tickCount')
-    ..a<$core.int>(2, 'pauseUntil', $pb.PbFieldType.OU3, protoName: 'pauseUntil')
-    ..a<$core.int>(3, 'eventEnd', $pb.PbFieldType.OU3, protoName: 'eventEnd')
-    ..aOM<Board>(4, 'board', subBuilder: Board.create)
-    ..pc<Entity>(5, 'cats', $pb.PbFieldType.PM, subBuilder: Entity.create)
-    ..pc<Entity>(6, 'mice', $pb.PbFieldType.PM, subBuilder: Entity.create)
-    ..p<$core.int>(7, 'scores', $pb.PbFieldType.PU3)
-    ..a<$fixnum.Int64>(8, 'rngState', $pb.PbFieldType.OU6, protoName: 'rngState', defaultOrMaker: $fixnum.Int64.ZERO)
-    ..e<GameEvent>(9, 'event', $pb.PbFieldType.OE, defaultOrMaker: GameEvent.NO_EVENT, valueOf: GameEvent.valueOf, enumValues: GameEvent.values)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GameState', createEmptyInstance: create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tickCount', $pb.PbFieldType.OU3, protoName: 'tickCount')
+    ..a<$core.int>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'pauseUntil', $pb.PbFieldType.OU3, protoName: 'pauseUntil')
+    ..a<$core.int>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'eventEnd', $pb.PbFieldType.OU3, protoName: 'eventEnd')
+    ..aOM<Board>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'board', subBuilder: Board.create)
+    ..pc<Entity>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cats', $pb.PbFieldType.PM, subBuilder: Entity.create)
+    ..pc<Entity>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mice', $pb.PbFieldType.PM, subBuilder: Entity.create)
+    ..p<$core.int>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'scores', $pb.PbFieldType.PU3)
+    ..a<$fixnum.Int64>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'rngState', $pb.PbFieldType.OU6, protoName: 'rngState', defaultOrMaker: $fixnum.Int64.ZERO)
+    ..e<GameEvent>(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'event', $pb.PbFieldType.OE, defaultOrMaker: GameEvent.NO_EVENT, valueOf: GameEvent.valueOf, enumValues: GameEvent.values)
     ..hasRequiredFields = false
   ;
 
@@ -203,8 +227,16 @@ class GameState extends $pb.GeneratedMessage {
   factory GameState() => create();
   factory GameState.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory GameState.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   GameState clone() => GameState()..mergeFromMessage(this);
-  GameState copyWith(void Function(GameState) updates) => super.copyWith((message) => updates(message as GameState));
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  GameState copyWith(void Function(GameState) updates) => super.copyWith((message) => updates(message as GameState)) as GameState; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static GameState create() => GameState._();
@@ -212,7 +244,7 @@ class GameState extends $pb.GeneratedMessage {
   static $pb.PbList<GameState> createRepeated() => $pb.PbList<GameState>();
   @$core.pragma('dart2js:noInline')
   static GameState getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GameState>(create);
-  static GameState _defaultInstance;
+  static GameState? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.int get tickCount => $_getIZ(0);

@@ -20,7 +20,7 @@ void main() {
         Tile.fromJson(jsonDecode('{"type":1,"player":0,"direction":0}'));
     expect(tile.runtimeType, Arrow);
     expect((tile as Arrow).player, PlayerColor.Blue);
-    expect((tile as Arrow).direction, Direction.Right);
+    expect(tile.direction, Direction.Right);
   });
 
   test('Tile.fromJson() on a Rocket', () {

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:fixnum/fixnum.dart';
 import 'package:test/test.dart';
 import 'package:nyanya_rocket_base/nyanya_rocket_base.dart';
 
@@ -12,16 +13,16 @@ void main() {
   });
 
   test(
-      'ExposedRandom produces the same sequence of numbers as Random with seed = MicrosSinceUtc & MASK_32',
+      'ExposedRandom produces the same sequence of numbers as Random with seed = Int32(MicrosSinceUtc)',
       () {
-    int seed = DateTime.now().microsecondsSinceEpoch & ExposedRandom.MASK_32;
+    int seed = Int32(DateTime.now().microsecondsSinceEpoch).toInt();
     testSimilarity(seed);
   });
 
   test(
-      'ExposedRandom produces the same sequence of numbers as Random with seed = MicrosSinceUtc & MASK_64',
+      'ExposedRandom produces the same sequence of numbers as Random with seed = Int64(MicrosSinceUtc)',
       () {
-    int seed = DateTime.now().microsecondsSinceEpoch & ExposedRandom.MASK_64;
+    int seed = Int64(DateTime.now().microsecondsSinceEpoch).toInt();
     testSimilarity(seed);
   });
 

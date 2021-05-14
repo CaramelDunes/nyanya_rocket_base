@@ -1,4 +1,3 @@
-import 'package:meta/meta.dart';
 import 'package:nyanya_rocket_base/nyanya_rocket_base.dart';
 import 'board.dart';
 import 'entity.dart';
@@ -6,6 +5,8 @@ import 'game_ticker.dart';
 import 'simulators/multiplayer_game_simulator.dart';
 import 'state/multiplayer_game_state.dart';
 import 'tile.dart';
+
+import 'package:meta/meta.dart';
 
 class ArrowPosition {
   final int x;
@@ -36,10 +37,10 @@ class ArrowPosition {
 
 class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
   GameEvent _scheduledEvent = GameEvent.None;
-  PlayerColor _eventOrigin;
+  PlayerColor? _eventOrigin;
 
   final List<List<ArrowPosition>> placedArrows =
-      List.generate(4, (_) => List(), growable: false);
+      List.generate(4, (_) => [], growable: false);
 
   MultiplayerGameTicker(MultiplayerGameState game)
       : super(game, MultiplayerGameSimulator());
@@ -60,7 +61,7 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
   bool placeArrow(int x, int y, PlayerColor player, Direction direction) {
     if (running && game.board.tiles[x][y] is Empty) {
       int count = 0;
-      ArrowPosition last;
+      ArrowPosition? last;
       int lastExpiration = 1 << 32;
 
       // TODO Get rid of that ugly thing
@@ -81,7 +82,7 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
       }
 
       if (count >= 3) {
-        game.board.tiles[last.x][last.y] = Empty();
+        game.board.tiles[last!.x][last.y] = Empty();
       }
 
       game.board.tiles[x][y] = Arrow(player: player, direction: direction);
@@ -143,9 +144,10 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
         // Cash-in all mice on board
         game.mice.forEach((mouse) {
           if (mouse is GoldenMouse) {
-            game.scores[_eventOrigin.index] += 50;
+            // Todo bundle with currentEvent.
+            game.scores[_eventOrigin!.index] += 50;
           } else {
-            game.scores[_eventOrigin.index]++;
+            game.scores[_eventOrigin!.index]++;
           }
         });
 
@@ -181,8 +183,8 @@ class MultiplayerGameTicker extends GameTicker<MultiplayerGameState> {
         break;
 
       case GameEvent.EverybodyMove:
-        List<PlayerColor> rocketColors = List();
-        List<ArrowPosition> rocketPositions = List();
+        List<PlayerColor> rocketColors = [];
+        List<ArrowPosition> rocketPositions = [];
 
         for (int i = 0; i < Board.width; i++) {
           for (int j = 0; j < Board.height; j++) {

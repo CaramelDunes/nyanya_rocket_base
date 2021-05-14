@@ -6,8 +6,8 @@ class GameState {
   int tickCount = 0;
   List<int> scores = List.filled(4, 0, growable: false);
   Board board = Board();
-  List<Cat> cats = List();
-  List<Mouse> mice = List();
+  List<Cat> cats = [];
+  List<Mouse> mice = [];
 
   GameState();
 
@@ -19,8 +19,10 @@ class GameState {
     entities.forEach((Entity e) {
       if (e is Cat) {
         cats.add(e);
-      } else {
+      } else if (e is Mouse) {
         mice.add(e);
+      } else {
+        // TODO
       }
     });
   }

@@ -1,5 +1,3 @@
-import 'package:meta/meta.dart';
-
 import 'board.dart';
 import 'protocol/game_state.pb.dart' as protocol;
 
@@ -13,7 +11,7 @@ enum EntityType {
 abstract class Entity {
   BoardPosition position;
 
-  Entity({@required this.position});
+  Entity({required this.position});
 
   factory Entity.fromJson(Map<String, dynamic> parsedJson) {
     return Entity.fromEntityType(EntityType.values[parsedJson['type']],
@@ -24,23 +22,18 @@ abstract class Entity {
     switch (type) {
       case EntityType.Cat:
         return Cat(position: position);
-        break;
 
       case EntityType.Mouse:
         return Mouse(position: position);
-        break;
 
       case EntityType.GoldenMouse:
         return GoldenMouse(position: position);
-        break;
 
       case EntityType.SpecialMouse:
         return SpecialMouse(position: position);
-        break;
 
       default:
         return Mouse(position: position);
-        break;
     }
   }
 
@@ -73,34 +66,29 @@ abstract class Entity {
   }
 
   factory Entity.fromProtocolEntity(protocol.Entity entity) {
-    Entity e;
     switch (entity.type) {
       case protocol.EntityType.CAT:
-        e = Cat(
+        return Cat(
             position: BoardPosition(entity.x, entity.y,
                 Direction.values[entity.direction.value], entity.step));
-        break;
 
       case protocol.EntityType.MOUSE:
-        e = Mouse(
+        return Mouse(
             position: BoardPosition(entity.x, entity.y,
                 Direction.values[entity.direction.value], entity.step));
-        break;
 
       case protocol.EntityType.GOLDEN_MOUSE:
-        e = GoldenMouse(
+        return GoldenMouse(
             position: BoardPosition(entity.x, entity.y,
                 Direction.values[entity.direction.value], entity.step));
-        break;
 
       case protocol.EntityType.SPECIAL_MOUSE:
-        e = SpecialMouse(
+        return SpecialMouse(
             position: BoardPosition(entity.x, entity.y,
                 Direction.values[entity.direction.value], entity.step));
-        break;
     }
 
-    return e;
+    throw Exception(); //FIXME
   }
 
   int moveSpeed();
@@ -109,7 +97,7 @@ abstract class Entity {
 }
 
 class Cat extends Entity {
-  Cat({@required BoardPosition position}) : super(position: position);
+  Cat({required BoardPosition position}) : super(position: position);
 
   Cat copy() => Cat(position: position.copy());
 
@@ -124,7 +112,7 @@ class Cat extends Entity {
 }
 
 class Mouse extends Entity {
-  Mouse({@required BoardPosition position}) : super(position: position);
+  Mouse({required BoardPosition position}) : super(position: position);
 
   Mouse copy() => Mouse(position: position.copy());
 
@@ -139,7 +127,7 @@ class Mouse extends Entity {
 }
 
 class GoldenMouse extends Mouse {
-  GoldenMouse({@required BoardPosition position}) : super(position: position);
+  GoldenMouse({required BoardPosition position}) : super(position: position);
 
   GoldenMouse copy() => GoldenMouse(position: position.copy());
 
@@ -151,7 +139,7 @@ class GoldenMouse extends Mouse {
 }
 
 class SpecialMouse extends Mouse {
-  SpecialMouse({@required BoardPosition position}) : super(position: position);
+  SpecialMouse({required BoardPosition position}) : super(position: position);
 
   SpecialMouse copy() => SpecialMouse(position: position.copy());
 

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:meta/meta.dart';
 
 import '../board.dart';
 import '../tile.dart';
@@ -25,15 +24,15 @@ class ClientSocket extends CapsuleSocket {
 
   int _serverSequenceNumber = -1;
 
-  Timer _pingTimer;
+  Timer? _pingTimer;
 
   ClientSocket(
-      {@required this.serverAddress,
-      @required this.serverPort,
-      @required this.nickname,
-      @required this.onGameUpdate,
-      @required this.onPlayerRegister,
-      @required this.onPlayerNicknames,
+      {required this.serverAddress,
+      required this.serverPort,
+      required this.nickname,
+      required this.onGameUpdate,
+      required this.onPlayerRegister,
+      required this.onPlayerNicknames,
       this.ticket = 0})
       : super();
 
@@ -46,12 +45,9 @@ class ClientSocket extends CapsuleSocket {
 
   @override
   void onSocketReady() {
-    RegisterMessage registerMessage = RegisterMessage()
-      ..nickname = nickname ?? '';
+    RegisterMessage registerMessage = RegisterMessage()..nickname = nickname;
 
-    if (ticket != null) {
-      registerMessage..ticket = ticket;
-    }
+    registerMessage..ticket = ticket;
 
     Capsule capsule = Capsule()..register = registerMessage;
 
@@ -101,9 +97,7 @@ class ClientSocket extends CapsuleSocket {
     Capsule capsule = Capsule();
     capsule.ping = PingMessage();
 
-    if (ticket != null) {
-      capsule.ping..ticket = ticket;
-    }
+    capsule.ping..ticket = ticket;
 
     sendCapsule(capsule, serverAddress, serverPort, true);
   }

@@ -12,13 +12,13 @@ abstract class CapsuleSocket {
   final int boundPort;
 
   int _mySequenceNumber = 0;
-  RawDatagramSocket _socket;
+  RawDatagramSocket? _socket;
 
   CapsuleSocket({this.boundPort = 0}) {
     RawDatagramSocket.bind(InternetAddress.anyIPv4, boundPort)
         .then((RawDatagramSocket socket) {
       _socket = socket;
-      _socket.listen(_handleSocketEvent);
+      socket.listen(_handleSocketEvent);
 
       onSocketReady();
 
@@ -49,7 +49,7 @@ abstract class CapsuleSocket {
 
     int copies = sendCopies ? _redundancyCount : 1;
     for (int i = 0; i < copies; i++) {
-      _socket.send(payload, address, port);
+      _socket!.send(payload, address, port);
     }
 
     _mySequenceNumber += 1;
@@ -63,7 +63,7 @@ abstract class CapsuleSocket {
 
   void _handleSocketEvent(RawSocketEvent event) {
     if (event == RawSocketEvent.read) {
-      Datagram packet = _socket.receive();
+      Datagram? packet = _socket!.receive();
 
       if (packet != null) {
         Uint8List buffer = packet.data;
@@ -89,13 +89,13 @@ abstract class CapsuleSocket {
       }
     } else if (event == RawSocketEvent.closed ||
         event == RawSocketEvent.readClosed) {
-      _socket.close();
+      _socket!.close();
       _socket = null;
 
       RawDatagramSocket.bind(InternetAddress.anyIPv4, boundPort)
           .then((RawDatagramSocket socket) {
         _socket = socket;
-        _socket.listen(_handleSocketEvent);
+        _socket!.listen(_handleSocketEvent);
 
         print('Listening on port ${socket.port}');
       });
