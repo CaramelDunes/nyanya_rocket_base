@@ -41,6 +41,7 @@ class ServerSocket extends CapsuleSocket {
   final PlaceArrow onPlaceArrow;
   final VoidCallback onPlayerJoin;
 
+  // TODO Federate in a class.
   final HashMap<_AddressPort, _ConnectionInfo> _connections = HashMap();
   final HashMap<int, _AddressPort> _ticketsToConnection = HashMap();
 
@@ -101,7 +102,7 @@ class ServerSocket extends CapsuleSocket {
 
             // Update player IP address and port.
             _ticketsToConnection[ticket] = key;
-            _connections[key] = _connections.remove(old)!; // TODO Remove !
+            _connections[key] = _connections.remove(old)!;
           }
         }
         break;

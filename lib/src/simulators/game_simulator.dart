@@ -67,7 +67,7 @@ abstract class GameSimulator<StateType extends GameState> {
     gameState.mice.forEach((Mouse mouse) {
       bool dead = false;
       for (Cat cat in gameState.cats) {
-        if (_colliding(mouse, cat)) {
+        if (colliding(mouse.position, cat.position)) {
           dead = true;
           onMouseEaten?.call(mouse, cat);
           break;
@@ -305,17 +305,17 @@ abstract class GameSimulator<StateType extends GameState> {
     return BoardPosition(x, y, front, step);
   }
 
-  double _xBlend(Entity entity) {
-    double xBlend = entity.position.x.toDouble();
+  static double _xBlend(BoardPosition position) {
+    double xBlend = position.x.toDouble();
 
-    switch (entity.position.direction) {
+    switch (position.direction) {
       case Direction.Right:
-        xBlend += entity.position.step / BoardPosition.maxStep;
+        xBlend += position.step / BoardPosition.maxStep;
         break;
 
       case Direction.Left:
-        xBlend += (BoardPosition.maxStep - entity.position.step) /
-            BoardPosition.maxStep;
+        xBlend +=
+            (BoardPosition.maxStep - position.step) / BoardPosition.maxStep;
         break;
 
       default:
@@ -328,17 +328,17 @@ abstract class GameSimulator<StateType extends GameState> {
     return xBlend;
   }
 
-  double _yBlend(Entity entity) {
-    double yBlend = entity.position.y.toDouble();
+  static double _yBlend(BoardPosition position) {
+    double yBlend = position.y.toDouble();
 
-    switch (entity.position.direction) {
+    switch (position.direction) {
       case Direction.Up:
-        yBlend += (BoardPosition.maxStep - entity.position.step) /
-            BoardPosition.maxStep;
+        yBlend +=
+            (BoardPosition.maxStep - position.step) / BoardPosition.maxStep;
         break;
 
       case Direction.Down:
-        yBlend += entity.position.step / BoardPosition.maxStep;
+        yBlend += position.step / BoardPosition.maxStep;
         break;
 
       default:
@@ -351,7 +351,7 @@ abstract class GameSimulator<StateType extends GameState> {
     return yBlend;
   }
 
-  bool _colliding(Entity a, Entity b) {
+  static bool colliding(BoardPosition a, BoardPosition b) {
     double axBlend = _xBlend(a);
     double ayBlend = _yBlend(a);
 
