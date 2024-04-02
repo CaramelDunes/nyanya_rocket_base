@@ -1,5 +1,3 @@
-import 'package:nyanya_rocket_base/nyanya_rocket_base.dart';
-
 import '../state/multiplayer_game_state.dart';
 import 'generators/multiplayer_generator.dart';
 import 'game_simulator.dart';

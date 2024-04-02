@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import '../board.dart';
 import '../state/multiplayer_game_state.dart';
 import '../multiplayer_game_ticker.dart';

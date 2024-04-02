@@ -47,8 +47,9 @@ class GameState {
   }
 
   @override
-  bool operator ==(dynamic other) {
-    if (runtimeType != other.runtimeType) return false;
+  bool operator ==(Object other) {
+    if (other is! GameState) return false;
+    // GameState are never equal for now.
     return false;
   }
 }

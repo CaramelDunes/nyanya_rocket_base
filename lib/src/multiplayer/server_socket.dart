@@ -15,8 +15,10 @@ class _AddressPort {
   _AddressPort(this.address, this.port);
 
   @override
-  bool operator ==(dynamic other) =>
-      other.port == port && other.address.toString() == address.toString();
+  bool operator ==(Object other) =>
+      other is _AddressPort &&
+      other.port == port &&
+      other.address.toString() == address.toString();
 
   @override
   int get hashCode {

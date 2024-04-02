@@ -1,12 +1,11 @@
-import 'package:nyanya_rocket_base/nyanya_rocket_base.dart';
+import 'package:meta/meta.dart';
+
 import 'board.dart';
 import 'entity.dart';
 import 'game_ticker.dart';
 import 'simulators/multiplayer_game_simulator.dart';
 import 'state/multiplayer_game_state.dart';
 import 'tile.dart';
-
-import 'package:meta/meta.dart';
 
 class ArrowPosition {
   final int x;

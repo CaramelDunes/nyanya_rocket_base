@@ -1,7 +1,5 @@
 import 'dart:math';
 
-import 'package:nyanya_rocket_base/nyanya_rocket_base.dart';
-
 import '../../state/game_state.dart';
 import '../../board.dart';
 import '../../entity.dart';
